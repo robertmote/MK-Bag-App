@@ -261,13 +261,26 @@ const saveSettings=()=>lsSet('Mary Katherine_settings',S.settings);
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 const $=id=>document.getElementById(id);
-const fmt=n=>'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+const cur=()=>S.settings.currency||'USD';
+const fmt=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:cur(),minimumFractionDigits:0,maximumFractionDigits:0});
 const fmtPct=n=>(n>=0?'+':'')+n.toFixed(1)+'%';
 const todayStr=()=>new Date().toISOString().split('T')[0];
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const dateShort=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch{return d||'—';}};
 const dateLong=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});}catch{return d||'—';}};
 const calcPct=(cur,cost)=>cost>0?((cur-cost)/cost)*100:0;
+
+// Calls Claude (with web search) through server.mjs, which holds the API key. Returns the JSON in Claude's reply.
+async function askClaude(prompt){
+  let res;
+  try{res=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});}
+  catch{throw new Error('Cannot reach the app server. Run "npm start" and open http://localhost:3000');}
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok)throw new Error(data.error||'Request failed ('+res.status+')');
+  const t=data.text||'',i=t.search(/[\[{]/),j=Math.max(t.lastIndexOf('}'),t.lastIndexOf(']'));
+  if(i<0||j<i)throw new Error('Claude did not return any data. Please try again.');
+  return JSON.parse(t.slice(i,j+1));
+}
 
 function deltaBadge(p){
   return p>=0
@@ -606,12 +619,12 @@ function renderAddBag(){
       <div class="divider"></div>
       <div class="section-lbl">Purchase details</div>
       <div class="field-grid">
-        <div class="field"><label>Purchase price ($)</label><input class="inp" type="number" value="${esc(f.purchasePrice||'')}" oninput="addSet('purchasePrice',this.value)" placeholder="0"></div>
+        <div class="field"><label>Purchase price (${cur()})</label><input class="inp" type="number" value="${esc(f.purchasePrice||'')}" oninput="addSet('purchasePrice',this.value)" placeholder="0"></div>
         <div class="field"><label>Purchase date</label><input class="inp" type="date" value="${esc(f.purchaseDate||todayStr())}" oninput="addSet('purchaseDate',this.value)"></div>
       </div>
       <div class="field-grid">
         <div class="field"><label>Purchased from</label><div class="sel-wrap"><select class="inp" onchange="addSet('retailer',this.value)">${selOpts(RETAILERS,f.retailer||'','Select retailer')}</select></div></div>
-        <div class="field"><label>Current market value ($)</label><input class="inp" type="number" value="${esc(f.currentValue||'')}" oninput="addSet('currentValue',this.value)" placeholder="Leave blank to use purchase price"></div>
+        <div class="field"><label>Current market value (${cur()})</label><input class="inp" type="number" value="${esc(f.currentValue||'')}" oninput="addSet('currentValue',this.value)" placeholder="Leave blank to use purchase price"></div>
       </div>
       <div class="divider"></div>
       <div class="section-lbl">Condition</div>
@@ -740,14 +753,8 @@ async function trendsSearch(){
   const q=S.trendsQuery.trim();if(!q)return;
   S.trendsLoading=true;S.trendsError=null;S.trendsResults=null;render();
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Search for current luxury handbag resale market data about: "${q}". Provide a concise market summary. Respond ONLY with a valid JSON object (no markdown, no backticks) with keys: summary (2-3 sentences), priceRange (string), trend (string like "+12% YoY"), outlook ("bullish"|"bearish"|"stable"), keyFactors (array of strings max 4), sources (array of strings).`}]})});
-    const data=await res.json();
-    const text=(data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
-    S.trendsResults=JSON.parse(text.replace(/```json|```/g,'').trim());
-  }catch(e){S.trendsError='Unable to fetch market data. Please try again.';}
+    S.trendsResults=await askClaude(`Search for current luxury handbag resale market data about: "${q}". Provide a concise market summary. Give prices in ${cur()}. Respond ONLY with a valid JSON object (no markdown, no backticks) with keys: summary (2-3 sentences), priceRange (string), trend (string like "+12% YoY"), outlook ("bullish"|"bearish"|"stable"), keyFactors (array of strings max 4), sources (array of strings).`);
+  }catch(e){S.trendsError=e.message;}
   S.trendsLoading=false;render();
 }
 function trendsQuick(q){S.trendsQuery=q;trendsSearch();}
@@ -843,14 +850,8 @@ async function reportsGenerate(){
     const summary=S.bags.map(b=>({name:b.name,brand:b.brand,purchasePrice:b.purchasePrice,currentValue:b.currentValue,year:b.year,condition:b.condition}));
     const tv=S.bags.reduce((a,b)=>a+(b.currentValue||0),0);
     const tc=S.bags.reduce((a,b)=>a+(b.purchasePrice||0),0);
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Generate a luxury bag portfolio analysis. Collection: ${JSON.stringify(summary)}. Total value: $${tv.toLocaleString()}. Cost: $${tc.toLocaleString()}. Search for current market conditions. Respond ONLY with a valid JSON object (no markdown, no backticks): { "executiveSummary":"...", "strengths":["...","...","..."], "risks":["...","..."], "recommendations":["...","...","..."], "marketNote":"..." }`}]})});
-    const data=await res.json();
-    const text=(data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
-    S.reportsReport=JSON.parse(text.replace(/```json|```/g,'').trim());
-  }catch(e){S.reportsReport={executiveSummary:'Report generation encountered an error. Please try again.',strengths:[],risks:[],recommendations:[],marketNote:''};}
+    S.reportsReport=await askClaude(`Generate a luxury bag portfolio analysis. All prices are in ${cur()}. Collection: ${JSON.stringify(summary)}. Total value: ${fmt(tv)}. Cost: ${fmt(tc)}. Search for current market conditions. Respond ONLY with a valid JSON object (no markdown, no backticks): { "executiveSummary":"...", "strengths":["...","...","..."], "risks":["...","..."], "recommendations":["...","...","..."], "marketNote":"..." }`);
+  }catch(e){S.reportsReport={executiveSummary:'Report generation failed: '+e.message,strengths:[],risks:[],recommendations:[],marketNote:''};}
   S.reportsLoading=false;render();
 }
 
@@ -872,10 +873,10 @@ function renderAlerts(){
         ${bags.map(b=>`<option value="${esc(b.id)}" ${f.bagId===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}
       </select></div></div>
       <div class="field"><label>Alert when value is</label><div class="sel-wrap"><select class="inp" onchange="alertSet('type',this.value)">
-        <option value="above" ${f.type==='above'?'selected':''}>Above target ($)</option>
-        <option value="below" ${f.type==='below'?'selected':''}>Below target ($)</option>
+        <option value="above" ${f.type==='above'?'selected':''}>Above target</option>
+        <option value="below" ${f.type==='below'?'selected':''}>Below target</option>
       </select></div></div>
-      <div class="field"><label>Target price ($)</label><input class="inp" type="number" value="${esc(f.targetPrice)}" oninput="alertSet('targetPrice',this.value)" placeholder="e.g. 30000"></div>
+      <div class="field"><label>Target price (${cur()})</label><input class="inp" type="number" value="${esc(f.targetPrice)}" oninput="alertSet('targetPrice',this.value)" placeholder="e.g. 30000"></div>
     </div>
     ${f.bagId?`<div class="text-12 c-dark mb-14">Current value: ${fmt(bags.find(b=>b.id===f.bagId)?.currentValue||0)}</div>`:''}
     <div class="flex gap-8">
@@ -931,14 +932,13 @@ function renderWishlist(){
     <div class="text-14 f500 c-deepest mb-14">Add to wishlist</div>
     <div class="field-grid">
       <div class="field"><label>Brand</label><div class="sel-wrap"><select class="inp" onchange="wishSet('brand',this.value)">
-        ${['','...'].concat(BRANDS).filter((v,i)=>i===0||BRANDS.includes(v)).map(v=>v===''?`<option value="">Select brand</option>`:`<option ${f.brand===v?'selected':''}>${esc(v)}</option>`).join('')}
-        ${BRANDS.map(v=>`<option ${f.brand===v?'selected':''}>${esc(v)}</option>`).join('')}
+        ${selOpts(BRANDS,f.brand,'Select brand')}
       </select></div></div>
       <div class="field"><label>Model</label><input class="inp" value="${esc(f.model)}" oninput="wishSet('model',this.value)" placeholder="e.g. Kelly 28"></div>
     </div>
     <div class="field-grid">
       <div class="field"><label>Color</label><input class="inp" value="${esc(f.color)}" oninput="wishSet('color',this.value)" placeholder="e.g. Rouge Casaque"></div>
-      <div class="field"><label>Max budget ($)</label><input class="inp" type="number" value="${esc(f.maxBudget)}" oninput="wishSet('maxBudget',this.value)" placeholder="0"></div>
+      <div class="field"><label>Max budget (${cur()})</label><input class="inp" type="number" value="${esc(f.maxBudget)}" oninput="wishSet('maxBudget',this.value)" placeholder="0"></div>
     </div>
     <div class="field"><label>Notes</label><textarea class="inp" rows="2" oninput="wishSet('notes',this.value)" placeholder="Preferred condition, year, any other details…">${esc(f.notes)}</textarea></div>
     <div class="flex gap-8" style="margin-top:14px">
@@ -1068,14 +1068,7 @@ async function aiRefreshValues(){
   const bagList=S.bags.map((b,i)=>`${i+1}. ${b.brand} ${b.model}${b.color?' in '+b.color:''}${b.size?', '+b.size:''}${b.year?', '+b.year:''} (condition: ${b.condition})`).join('\n');
 
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:2000,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Search the web for current 2025 resale market values for each of these luxury handbags. For each bag, search authenticated resale platforms (Vestiaire Collective, The RealReal, Fashionphile, 1stDibs) to find realistic current resale price ranges.
+    const results=await askClaude(`Search the web for current ${new Date().getFullYear()} resale market values, in ${cur()}, for each of these luxury handbags. For each bag, search authenticated resale platforms (Vestiaire Collective, The RealReal, Fashionphile, 1stDibs) to find realistic current resale price ranges.
 
 Bags to research:
 ${bagList}
@@ -1086,14 +1079,7 @@ Respond ONLY with a valid JSON array (no markdown, no backticks, no explanation)
   ...
 ]
 
-Use realistic resale market prices (not retail). If you cannot find data for a bag, use null for estimatedValue and explain briefly in source.`}]
-      })
-    });
-
-    const data=await res.json();
-    const text=(data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
-    const clean=text.replace(/```json|```/g,'').trim();
-    const results=JSON.parse(clean);
+Use realistic resale market prices (not retail). If you cannot find data for a bag, use null for estimatedValue and explain briefly in source.`);
 
     // Apply updates and build log
     const log=[];
@@ -1125,7 +1111,7 @@ Use realistic resale market prices (not retail). If you cannot find data for a b
 
   }catch(e){
     console.error(e);
-    toast('AI value refresh failed — please try again');
+    toast('AI value refresh failed: '+e.message);
   }
 
   S.aiRefreshing=false;
@@ -1148,7 +1134,12 @@ const PAGES={
 
 function render(){
   syncSidebar();
+  // Rebuilding #main destroys the focused field; remember it (by its oninput handler) and restore focus + caret.
+  const a=document.activeElement,key=a&&$('main').contains(a)?a.getAttribute('oninput'):null;
+  let pos=null;try{pos=a.selectionStart;}catch{}
   $('main').innerHTML=(PAGES[S.page]||renderDashboard)();
+  const el=key&&[...$('main').querySelectorAll('[oninput]')].find(e=>e.getAttribute('oninput')===key);
+  if(el){el.focus();try{if(pos!==null)el.setSelectionRange(pos,pos);}catch{}}
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
