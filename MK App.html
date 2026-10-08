@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Mary Katherine — Luxury Bag Value Tracker</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#FDF6F9;height:100vh;overflow:hidden}
+#app{display:flex;height:100vh;overflow:hidden}
+
+/* ── Sidebar ── */
+#sidebar{width:210px;background:#FBEAF0;border-right:.5px solid #F4C0D1;display:flex;flex-direction:column;flex-shrink:0}
+.sb-logo{padding:24px 20px 20px;border-bottom:.5px solid #F4C0D1}
+.sb-logo-row{display:flex;align-items:center;gap:10px}
+.sb-logo-icon{width:32px;height:32px;background:#D4537E;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.sb-logo-icon i{color:#FBEAF0;font-size:18px}
+.sb-logo-name{font-size:14px;font-weight:500;color:#4B1528}
+.sb-logo-sub{font-size:11px;color:#993556}
+.nav-section{padding:16px 12px 8px}
+.nav-lbl{font-size:10px;font-weight:500;color:#993556;letter-spacing:.08em;text-transform:uppercase;padding:0 8px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;font-size:13px;color:#72243E;user-select:none;transition:background .1s}
+.nav-item:hover{background:#F4C0D1}
+.nav-item.active{background:#D4537E;color:#FBEAF0}
+.nav-item i{font-size:17px;color:#993556;flex-shrink:0}
+.nav-item.active i{color:#FBEAF0}
+.sb-footer{margin-top:auto;padding:16px 12px;border-top:.5px solid #F4C0D1}
+.user-pill{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer}
+.user-pill:hover{background:#F4C0D1}
+.avatar{width:30px;height:30px;background:#D4537E;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#FBEAF0;flex-shrink:0}
+
+/* ── Main ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:#fff;border-bottom:.5px solid #F4C0D1;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-title{font-size:16px;font-weight:500;color:#4B1528}
+.tb-sub{font-size:12px;color:#993556;margin-top:1px}
+.content{flex:1;overflow-y:auto;padding:22px 24px}
+
+/* ── Cards ── */
+.card{background:#fff;border:.5px solid #F4C0D1;border-radius:12px;padding:18px}
+.stat-card{background:#fff;border:.5px solid #F4C0D1;border-radius:12px;padding:16px}
+.stat-lbl{font-size:11px;color:#993556;font-weight:500;margin-bottom:6px}
+.stat-val{font-size:22px;font-weight:500;color:#4B1528;line-height:1}
+.section-lbl{font-size:11px;font-weight:500;color:#993556;letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px}
+.divider{height:.5px;background:#F4C0D1;margin:16px 0}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;padding:8px 16px;border:none;transition:background .15s}
+.btn-primary{background:#D4537E;color:#FBEAF0}
+.btn-primary:hover{background:#993556}
+.btn-primary:disabled{opacity:.6;cursor:default}
+.btn-ghost{background:#fff;color:#993556;border:.5px solid #F4C0D1}
+.btn-ghost:hover{background:#FBEAF0}
+.btn-danger{background:#FCEBEB;color:#A32D2D;border:.5px solid #F7C1C1}
+.btn-danger:hover{background:#F7C1C1}
+.btn-sm{padding:5px 10px;font-size:12px}
+
+/* ── Forms ── */
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:14px}
+.field label,.flabel{font-size:12px;font-weight:500;color:#72243E;display:block;margin-bottom:4px}
+.inp{font-family:inherit;font-size:13px;color:#4B1528;background:#fff;border:.5px solid #F4C0D1;border-radius:8px;padding:8px 10px;outline:none;width:100%}
+.inp:focus{border-color:#D4537E;box-shadow:0 0 0 3px #FBEAF0}
+.inp::placeholder{color:#ED93B1}
+textarea.inp{resize:none;line-height:1.5}
+.sel-wrap{position:relative}
+.sel-wrap select{appearance:none;padding-right:28px}
+.sel-wrap::after{content:"\ea5f";font-family:"tabler-icons";position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:13px;color:#993556;pointer-events:none}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.field-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px}
+
+/* ── Badges / tags ── */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500}
+.badge-pink{background:#F4C0D1;color:#72243E}
+.badge-green{background:#EAF3DE;color:#3B6D11}
+.badge-green-mid{background:#C0DD97;color:#3B6D11}
+.badge-red{background:#FCEBEB;color:#A32D2D}
+.badge-amber{background:#FAC775;color:#633806}
+.badge-blush{background:#FBEAF0;color:#993556}
+.tag-pill{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;background:#fff;border:.5px solid #F4C0D1;color:#993556;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;transition:all .1s}
+.tag-pill.on{background:#FBEAF0;border-color:#D4537E;color:#72243E}
+.chip{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:.5px solid #F4C0D1;background:#fff;color:#993556;font-family:inherit}
+.chip.active{background:#D4537E;color:#FBEAF0;border-color:#D4537E}
+.cond-btn{flex:1;padding:8px 4px;border-radius:8px;border:.5px solid #F4C0D1;background:#fff;font-size:11px;font-weight:500;color:#993556;cursor:pointer;font-family:inherit;text-align:center}
+.cond-btn.active{background:#D4537E;color:#FBEAF0;border-color:#D4537E}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:24px;right:24px;background:#4B1528;color:#FBEAF0;padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;display:none;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+
+/* ── Grid helpers ── */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.flex{display:flex}.flex-col{flex-direction:column}
+.items-center{align-items:center}.items-start{align-items:flex-start}
+.justify-between{justify-content:space-between}
+.flex-1{flex:1}.min-w-0{min-width:0}.flex-shrink-0{flex-shrink:0}
+.gap-6{gap:6px}.gap-8{gap:8px}.gap-10{gap:10px}.gap-12{gap:12px}.gap-14{gap:14px}
+.mb-6{margin-bottom:6px}.mb-8{margin-bottom:8px}.mb-10{margin-bottom:10px}
+.mb-12{margin-bottom:12px}.mb-14{margin-bottom:14px}.mb-16{margin-bottom:16px}
+.mb-18{margin-bottom:18px}.mb-20{margin-bottom:20px}
+.nowrap{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.text-11{font-size:11px}.text-12{font-size:12px}.text-13{font-size:13px}.text-14{font-size:14px}.text-17{font-size:17px}
+.f500{font-weight:500}
+.c-rose{color:#D4537E}.c-dark{color:#993556}.c-darkest{color:#72243E}.c-deepest{color:#4B1528}
+.c-green{color:#3B6D11}.c-red{color:#A32D2D}
+.wrap{flex-wrap:wrap}
+
+/* ── Spinner ── */
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite}
+
+/* ── Empty state ── */
+.empty-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center}
+.empty-icon{width:56px;height:56px;background:#FBEAF0;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+
+/* ── Alert banner ── */
+.alert-banner{background:#EAF3DE;border:.5px solid #C0DD97;border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:13px;color:#3B6D11}
+
+/* ── Collection ── */
+#col-layout{flex:1;display:flex;overflow:hidden}
+.col-list-panel{width:270px;background:#fff;border-right:.5px solid #F4C0D1;display:flex;flex-direction:column;flex-shrink:0}
+.col-list-scroll{flex:1;overflow-y:auto;padding:8px}
+.col-detail-panel{flex:1;overflow-y:auto;padding:20px}
+.bag-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;cursor:pointer;margin-bottom:4px;border:.5px solid transparent}
+.bag-item:hover{background:#FBEAF0}
+.bag-item.active{background:#FBEAF0;border-color:#D4537E}
+.bag-thumb{width:44px;height:44px;border-radius:8px;background:#F4C0D1;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.search-box{display:flex;align-items:center;gap:8px;background:#FBEAF0;border:.5px solid #F4C0D1;border-radius:8px;padding:7px 10px;margin-bottom:10px}
+.search-box input{border:none;background:transparent;outline:none;font-size:12px;color:#4B1528;width:100%;font-family:inherit}
+
+/* ── Add bag ── */
+#add-layout{flex:1;display:grid;grid-template-columns:1fr 220px;overflow:hidden}
+.add-form{overflow-y:auto;padding:22px 24px;border-right:.5px solid #F4C0D1}
+.add-preview{padding:20px 18px;overflow-y:auto;background:#fff}
+.add-footer{padding:14px 24px;background:#fff;border-top:.5px solid #F4C0D1;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.preview-card{background:#FBEAF0;border:.5px solid #F4C0D1;border-radius:12px;overflow:hidden;margin-bottom:14px}
+.preview-img{height:90px;background:#F4C0D1;display:flex;align-items:center;justify-content:center}
+.preview-info{padding:12px}
+
+/* ── Settings toggles ── */
+.toggle{width:40px;height:22px;border-radius:11px;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s}
+.toggle-knob{width:18px;height:18px;border-radius:9px;background:#fff;position:absolute;top:2px;transition:left .2s}
+
+/* ── Wish grid ── */
+.wish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-row">
+        <div class="sb-logo-icon"><i class="ti ti-briefcase"></i></div>
+        <div>
+          <div class="sb-logo-name" id="sb-appname">Mary Katherine</div>
+          <div class="sb-logo-sub">Value Tracker</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-lbl">Overview</div>
+      <div class="nav-item" data-page="dashboard"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="nav-item" data-page="collection"><i class="ti ti-briefcase"></i> My collection</div>
+      <div class="nav-item" data-page="trends"><i class="ti ti-chart-line"></i> Market trends</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-lbl">Manage</div>
+      <div class="nav-item" data-page="add-bag"><i class="ti ti-plus"></i> Add a bag</div>
+      <div class="nav-item" data-page="reports"><i class="ti ti-file-text"></i> Reports</div>
+      <div class="nav-item" data-page="alerts"><i class="ti ti-bell"></i> Price alerts</div>
+      <div class="nav-item" data-page="wishlist"><i class="ti ti-bookmark"></i> Wishlist</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-lbl">Account</div>
+      <div class="nav-item" data-page="settings"><i class="ti ti-settings"></i> Settings</div>
+    </div>
+    <div class="sb-footer">
+      <div class="user-pill" onclick="go('settings')">
+        <div class="avatar" id="sb-avatar">SC</div>
+        <div style="flex:1;min-width:0">
+          <div class="text-12 f500 c-deepest nowrap" id="sb-name">Mary Katherine</div>
+          <div class="text-11 c-dark" id="sb-plan">Pro plan</div>
+        </div>
+        <i class="ti ti-dots-vertical" style="font-size:16px;color:#993556"></i>
+      </div>
+    </div>
+  </nav>
+  <div id="main"></div>
+</div>
+<div id="toast" class="flex items-center gap-10">
+  <i class="ti ti-circle-check" style="font-size:16px"></i>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+// ── Constants ──────────────────────────────────────────────────────────────────
+const ROSE='#D4537E',ROSE_DARK='#993556',ROSE_DARKEST='#72243E',ROSE_DEEPEST='#4B1528';
+const BLUSH='#FBEAF0',BLUSH_MID='#F4C0D1',BLUSH_BRIGHT='#ED93B1';
+const GREEN='#3B6D11',GREEN_BG='#EAF3DE',GREEN_MID='#C0DD97';
+const RED='#A32D2D',RED_BG='#FCEBEB';
+const AMBER='#633806',AMBER_BG='#FAC775';
+
+const BRANDS=['Hermès','Chanel','Louis Vuitton','Dior','Bottega Veneta','Gucci','Prada','Saint Laurent','Celine','Other'];
+const MATERIALS=['Togo leather','Epsom leather','Caviar leather','Lambskin','Canvas','Exotic skin','Other'];
+const HARDWARE=['Gold (GHW)','Palladium (PHW)','Ruthenium (RHW)','Rose gold','Silver'];
+const RETAILERS=['Boutique (retail)','Department store','Resale — authenticated','Private seller','Auction house','Other'];
+const CONDITIONS=['Never worn','Excellent','Very good','Good','Fair'];
+const ALL_TAGS=['Investment piece','Everyday use','With receipt','With dustbag','With box','Limited edition','Vintage','Gift'];
+
+const SEED_BAGS=[
+  {id:'b1',name:'Birkin 25 Togo Noir',brand:'Hermès',model:'Birkin 25',color:'Noir',material:'Togo leather',size:'25 cm',hardware:'Gold (GHW)',year:'2021',condition:'Excellent',retailer:'Boutique (retail)',purchaseDate:'2021-03-14',purchasePrice:21700,notes:'Serial: X·ABCD1234. Full set — orange box, dustbag, raincoat, lock and keys.',tags:['Investment piece','With receipt','With dustbag','With box'],currentValue:28500},
+  {id:'b2',name:'Classic Flap Medium Beige',brand:'Chanel',model:'Classic Flap',color:'Beige Clair',material:'Caviar leather',size:'Medium',hardware:'Gold (GHW)',year:'2020',condition:'Very good',retailer:'Boutique (retail)',purchaseDate:'2020-11-05',purchasePrice:9000,notes:'Auth card included. Minor scuff on bottom corner — professionally touched up.',tags:['Investment piece','With receipt','Everyday use'],currentValue:11200},
+  {id:'b3',name:'Lady Dior Small Blush',brand:'Dior',model:'Lady Dior',color:'Blush Pink',material:'Lambskin',size:'Small',hardware:'Rose gold',year:'2022',condition:'Never worn',retailer:'Department store',purchaseDate:'2022-06-22',purchasePrice:5900,notes:'Spring/Summer 2022 runway colour. Never removed from box.',tags:['With receipt','With dustbag','With box','Limited edition'],currentValue:6400},
+  {id:'b4',name:'Speedy 30 Monogram',brand:'Louis Vuitton',model:'Speedy 30',color:'Monogram Canvas',material:'Canvas',size:'30 cm',hardware:'Palladium (PHW)',year:'2019',condition:'Good',retailer:'Resale — authenticated',purchaseDate:'2019-08-10',purchasePrice:1870,notes:'Purchased from Vestiaire Collective. Authentication tag included.',tags:['Everyday use','Vintage'],currentValue:1800},
+  {id:'b5',name:'Constance 24 Étoupe',brand:'Hermès',model:'Constance 24',color:'Étoupe',material:'Epsom leather',size:'24 cm',hardware:'Palladium (PHW)',year:'2020',condition:'Excellent',retailer:'Boutique (retail)',purchaseDate:'2020-02-02',purchasePrice:17200,notes:'Full set. H clasp in perfect condition. Comes with strap.',tags:['Investment piece','With receipt','With dustbag','With box'],currentValue:22000}
+];
+const SEED_ALERTS=[
+  {id:'a1',bagId:'b1',type:'above',targetPrice:30000,triggered:false,createdAt:'2024-01-01'},
+  {id:'a2',bagId:'b2',type:'above',targetPrice:11000,triggered:true,createdAt:'2024-01-01'}
+];
+const SEED_WISHLIST=[
+  {id:'w1',brand:'Hermès',model:'Kelly 28',color:'Rouge Casaque',material:'Epsom leather',hardware:'Gold (GHW)',maxBudget:25000,notes:'Dream bag — any year.',addedAt:'2024-03-01'},
+  {id:'w2',brand:'Chanel',model:'19 Bag Large',color:'Black',material:'Lambskin',hardware:'Mixed',maxBudget:9000,notes:'Prefer 2021 or newer.',addedAt:'2024-04-15'}
+];
+const DEF_SETTINGS={name:'Mary Katherine',email:'',appName:'Mary Katherine',currency:'USD',plan:'Pro plan',notifyAlerts:true,notifyMarket:false,notifyReports:true};
+
+// ── State ──────────────────────────────────────────────────────────────────────
+let S={
+  page:'dashboard',
+  bags:[],alerts:[],wishlist:[],
+  settings:{...DEF_SETTINGS},
+  editBag:null,
+  colSelected:null,colSearch:'',colBrandFilter:'All',
+  addForm:null,
+  trendsQuery:'',trendsLoading:false,trendsResults:null,trendsError:null,
+  reportsReport:null,reportsLoading:false,
+  alertAdding:false,alertForm:{bagId:'',type:'above',targetPrice:''},
+  wishAdding:false,wishForm:{brand:'',model:'',color:'',material:'',hardware:'',maxBudget:'',notes:''},
+  colEditingVal:false,
+  aiRefreshing:false,
+  aiRefreshLog:[]
+};
+
+// ── Storage ────────────────────────────────────────────────────────────────────
+function lsGet(k,fb){try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch{return fb;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+function loadAll(){
+  S.bags=lsGet('Mary Katherine_bags',SEED_BAGS);
+  S.alerts=lsGet('Mary Katherine_alerts',SEED_ALERTS);
+  S.wishlist=lsGet('Mary Katherine_wishlist',SEED_WISHLIST);
+  const sv=lsGet('Mary Katherine_settings',null);
+  if(sv) S.settings={...DEF_SETTINGS,...sv};
+  if(S.bags.length) S.colSelected=S.bags[0].id;
+}
+const saveBags=()=>lsSet('Mary Katherine_bags',S.bags);
+const saveAlerts=()=>lsSet('Mary Katherine_alerts',S.alerts);
+const saveWish=()=>lsSet('Mary Katherine_wishlist',S.wishlist);
+const saveSettings=()=>lsSet('Mary Katherine_settings',S.settings);
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+const $=id=>document.getElementById(id);
+const fmt=n=>'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmtPct=n=>(n>=0?'+':'')+n.toFixed(1)+'%';
+const todayStr=()=>new Date().toISOString().split('T')[0];
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const dateShort=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch{return d||'—';}};
+const dateLong=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});}catch{return d||'—';}};
+const calcPct=(cur,cost)=>cost>0?((cur-cost)/cost)*100:0;
+
+function deltaBadge(p){
+  return p>=0
+    ?`<span class="badge badge-green"><i class="ti ti-trending-up" style="font-size:10px;margin-right:3px"></i>${fmtPct(p)}</span>`
+    :`<span class="badge badge-red"><i class="ti ti-trending-down" style="font-size:10px;margin-right:3px"></i>${fmtPct(p)}</span>`;
+}
+
+function emptyState(icon,title,sub,btn=''){
+  return `<div class="empty-wrap">
+    <div class="empty-icon"><i class="ti ti-${icon}" style="font-size:26px;color:#D4537E"></i></div>
+    <div class="text-14 f500 c-deepest mb-6">${esc(title)}</div>
+    <div class="text-13 c-dark mb-16" style="max-width:260px">${esc(sub)}</div>
+    ${btn}
+  </div>`;
+}
+
+let toastTid;
+function toast(msg){
+  $('toast-msg').textContent=msg;
+  const t=$('toast');
+  t.style.display='flex';
+  clearTimeout(toastTid);
+  toastTid=setTimeout(()=>t.style.display='none',3000);
+}
+
+function go(page){
+  S.page=page;
+  if(page==='add-bag'&&!S.editBag){
+    S.addForm={name:'',brand:'',model:'',color:'',material:'',size:'',hardware:'',year:'',condition:'Excellent',retailer:'',purchaseDate:todayStr(),purchasePrice:'',notes:'',tags:[],currentValue:''};
+  }
+  render();
+}
+
+// ── Sidebar sync ───────────────────────────────────────────────────────────────
+function syncSidebar(){
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    const active=el.dataset.page===S.page;
+    el.classList.toggle('active',active);
+    const ic=el.querySelector('i');
+    if(ic) ic.style.color=active?'#FBEAF0':'#993556';
+  });
+  const init=(S.settings.name||'SC').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  $('sb-avatar').textContent=init;
+  $('sb-name').textContent=S.settings.name||'Mary Katherine';
+  $('sb-plan').textContent=S.settings.plan||'Pro plan';
+  $('sb-appname').textContent=S.settings.appName||'Mary Katherine';
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function renderDashboard(){
+  const bags=S.bags;
+  const tv=bags.reduce((a,b)=>a+(b.currentValue||0),0);
+  const tc=bags.reduce((a,b)=>a+(b.purchasePrice||0),0);
+  const ap=tc>0?((tv-tc)/tc)*100:0;
+  const sorted=[...bags].sort((a,b)=>calcPct(b.currentValue,b.purchasePrice)-calcPct(a.currentValue,a.purchasePrice));
+  const trig=S.alerts.filter(a=>a.triggered);
+
+  const banner=trig.length?`<div class="alert-banner">
+    <i class="ti ti-bell-ringing" style="font-size:16px"></i>
+    <strong>${trig.length} price alert${trig.length>1?'s':''}</strong> triggered —
+    <span style="cursor:pointer;text-decoration:underline" onclick="go('alerts')">view alerts</span>
+  </div>`:'';
+
+  if(!bags.length) return `
+    <div class="topbar"><div><div class="tb-title">Portfolio overview</div><div class="tb-sub">Get started by adding your first bag</div></div>
+      <button class="btn btn-primary" onclick="go('add-bag')"><i class="ti ti-plus"></i> Add bag</button></div>
+    <div class="content">${banner}${emptyState('briefcase','No bags yet','Add your first bag to start tracking your collection\'s value.',`<button class="btn btn-primary" onclick="go('add-bag')"><i class="ti ti-plus"></i> Add a bag</button>`)}</div>`;
+
+  const byBrand=bags.reduce((a,b)=>{a[b.brand]=(a[b.brand]||0)+(b.currentValue||0);return a;},{});
+
+  return `
+  <div class="topbar">
+    <div><div class="tb-title">Portfolio overview</div>
+    <div class="tb-sub">Last updated ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div></div>
+    <div class="flex gap-8">
+      <button class="btn btn-ghost" onclick="aiRefreshValues()" ${S.aiRefreshing||!bags.length?'disabled':''}>
+        <i class="ti ti-${S.aiRefreshing?'loader-2 spin':'sparkles'}"></i> ${S.aiRefreshing?'Updating values…':'Refresh values with AI'}
+      </button>
+      <button class="btn btn-primary" onclick="go('add-bag')"><i class="ti ti-plus"></i> Add bag</button>
+    </div>
+  </div>
+  <div class="content">
+    ${banner}
+    ${S.aiRefreshLog.length?`
+    <div class="card mb-16" style="border-color:#C0DD97;background:#F6FBF0">
+      <div class="flex justify-between items-center mb-10">
+        <div class="flex items-center gap-8">
+          <i class="ti ti-sparkles" style="font-size:16px;color:#3B6D11"></i>
+          <span class="text-13 f500" style="color:#3B6D11">AI value update complete</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="S.aiRefreshLog=[];render()">Dismiss</button>
+      </div>
+      ${S.aiRefreshLog.map(l=>`
+        <div class="flex items-center gap-10 mb-6">
+          <i class="ti ti-${l.ok?'circle-check':'alert-circle'}" style="font-size:14px;color:${l.ok?'#3B6D11':'#A32D2D'};flex-shrink:0"></i>
+          <span class="text-12 c-deepest nowrap" style="min-width:180px">${esc(l.name)}</span>
+          ${l.ok?`<span class="text-12 f500 c-deepest">${fmt(l.oldVal)} → ${fmt(l.newVal)}</span>
+            <span class="badge ${l.newVal>=l.oldVal?'badge-green':'badge-red'}" style="margin-left:4px">${l.newVal>=l.oldVal?'+':''}${(((l.newVal-l.oldVal)/l.oldVal)*100).toFixed(1)}%</span>
+            <span class="text-11 c-dark" style="margin-left:8px;flex:1">${esc(l.source||'')}</span>`
+          :`<span class="text-11" style="color:#A32D2D">${esc(l.error)}</span>`}
+        </div>`).join('')}
+    </div>`:''}
+    <div class="grid-4 mb-20">
+      ${[
+        {l:'Total portfolio value',v:fmt(tv),x:deltaBadge(ap)},
+        {l:'Total bags tracked',v:bags.length,x:`<span class="badge badge-blush">in collection</span>`},
+        {l:'Avg. appreciation',v:fmtPct(ap),x:`<span class="text-11 c-dark">vs. purchase</span>`},
+        {l:'Total cost basis',v:fmt(tc),x:`<span class="text-11 c-dark">purchase prices</span>`}
+      ].map(s=>`<div class="stat-card"><div class="stat-lbl">${s.l}</div><div class="stat-val">${s.v}</div><div style="margin-top:6px">${s.x}</div></div>`).join('')}
+    </div>
+    <div class="grid-2 mb-14">
+      <div class="card">
+        <div class="flex justify-between items-center mb-14">
+          <span class="text-13 f500 c-deepest">Top performing bags</span>
+          <span class="text-11 c-rose" style="cursor:pointer" onclick="go('collection')">View all →</span>
+        </div>
+        ${sorted.slice(0,5).map(b=>{const p=calcPct(b.currentValue,b.purchasePrice);return`
+          <div class="flex items-center gap-12 mb-10">
+            <div class="bag-thumb" style="width:38px;height:38px"><i class="ti ti-briefcase" style="font-size:18px;color:#993556"></i></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-12 f500 c-deepest nowrap">${esc(b.name)}</div>
+              <div class="text-11 c-dark">${esc(b.brand)} · ${esc(b.year)}</div>
+            </div>
+            <div style="text-align:right">
+              <div class="text-12 f500 c-deepest">${fmt(b.currentValue)}</div>
+              <div class="text-11" style="color:${p>=0?GREEN:RED}">${p>=0?'+':''}${p.toFixed(1)}%</div>
+            </div>
+          </div>`;}).join('')}
+      </div>
+      <div class="card">
+        <div class="text-13 f500 c-deepest mb-14">By brand</div>
+        ${Object.entries(byBrand).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([br,val])=>{const p=tv>0?(val/tv)*100:0;return`
+          <div class="flex items-center gap-8 text-12 mb-10">
+            <span style="width:80px;color:#993556;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(br)}</span>
+            <div style="flex:1;height:6px;background:#FBEAF0;border-radius:3px"><div style="width:${p.toFixed(0)}%;height:100%;background:#D4537E;border-radius:3px"></div></div>
+            <span class="f500 c-deepest" style="min-width:36px;text-align:right">${p.toFixed(0)}%</span>
+          </div>`;}).join('')}
+        <div class="divider" style="margin:14px 0"></div>
+        <div class="text-13 f500 c-deepest mb-10">Recent activity</div>
+        ${bags.slice(-3).reverse().map(b=>`
+          <div class="flex items-center gap-10 mb-8">
+            <div style="width:8px;height:8px;border-radius:50%;background:#D4537E;flex-shrink:0"></div>
+            <div><div class="text-12 c-deepest">${esc(b.name)} added to collection</div>
+            <div class="text-11 c-dark">${dateShort(b.purchaseDate)}</div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── COLLECTION ────────────────────────────────────────────────────────────────
+function renderCollection(){
+  const bags=S.bags;
+  const brands=['All',...new Set(bags.map(b=>b.brand))];
+  const fil=bags.filter(b=>(S.colBrandFilter==='All'||b.brand===S.colBrandFilter)&&
+    (b.name.toLowerCase().includes(S.colSearch.toLowerCase())||b.brand.toLowerCase().includes(S.colSearch.toLowerCase())));
+  if(!S.colSelected&&fil.length) S.colSelected=fil[0].id;
+  const bag=bags.find(b=>b.id===S.colSelected);
+
+  let detail='';
+  if(!bag){
+    detail=emptyState('briefcase','Select a bag','Choose a bag from the list to see its full details.');
+  } else {
+    const p=calcPct(bag.currentValue,bag.purchasePrice);
+    const gain=bag.currentValue-bag.purchasePrice;
+    detail=`
+      <div class="flex justify-between items-center mb-18" style="flex-wrap:wrap;gap:10px">
+        <div class="flex items-center gap-14">
+          <div style="width:64px;height:64px;border-radius:10px;background:#F4C0D1;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="ti ti-briefcase" style="font-size:28px;color:#993556"></i></div>
+          <div>
+            <div class="text-17 f500 c-deepest">${esc(bag.name)}</div>
+            <div class="text-12 c-dark" style="margin-top:2px">${esc(bag.brand)} · ${esc(bag.year)}</div>
+            <div class="flex gap-6" style="margin-top:6px;flex-wrap:wrap">
+              <span class="badge badge-pink">${esc(bag.condition)}</span>
+              ${(bag.tags||[]).includes('With receipt')?'<span class="badge badge-green">With receipt</span>':''}
+              ${(bag.tags||[]).includes('Investment piece')?'<span class="badge badge-amber">Investment piece</span>':''}
+              ${(bag.tags||[]).includes('Limited edition')?'<span class="badge" style="background:#FBEAF0;color:#D4537E">Limited edition</span>':''}
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-8">
+          <button class="btn btn-ghost btn-sm" onclick="colEditBag('${esc(bag.id)}')"><i class="ti ti-edit"></i> Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="colDeleteBag('${esc(bag.id)}')"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>
+
+      <div class="grid-3 mb-18">
+        <div class="card">
+          <div class="text-11 c-dark f500" style="text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Purchase price</div>
+          <div style="font-size:18px;font-weight:500;color:#4B1528">${fmt(bag.purchasePrice)}</div>
+          <div class="text-11 c-dark" style="margin-top:4px">${dateShort(bag.purchaseDate)}</div>
+        </div>
+        <div class="card">
+          <div class="text-11 c-dark f500" style="text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Current market value</div>
+          <div id="col-val-display" style="font-size:18px;font-weight:500;color:#4B1528">
+            ${fmt(bag.currentValue)}
+            <i class="ti ti-pencil" style="font-size:11px;color:#993556;cursor:pointer;margin-left:4px" onclick="colStartEdit(${bag.currentValue},'${esc(bag.id)}')" title="Update value"></i>
+          </div>
+          <div id="col-val-edit" style="display:none;margin-top:6px">
+            <div class="flex gap-6">
+              <input id="col-new-val" type="number" value="${bag.currentValue}" class="inp" style="width:110px">
+              <button class="btn btn-primary btn-sm" onclick="colSaveVal('${esc(bag.id)}')">Save</button>
+              <button class="btn btn-ghost btn-sm" onclick="colCancelEdit()">✕</button>
+            </div>
+          </div>
+          <div style="margin-top:4px">${deltaBadge(p)}</div>
+          ${bag.lastAiUpdate?`<div class="text-11 c-dark" style="margin-top:3px"><i class="ti ti-sparkles" style="font-size:10px;margin-right:3px;color:#D4537E"></i>AI updated ${dateShort(bag.lastAiUpdate)}</div>`:''}
+        </div>
+        <div class="card">
+          <div class="text-11 c-dark f500" style="text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Gain / Loss</div>
+          <div style="font-size:18px;font-weight:500;color:#4B1528">${fmt(gain)}</div>
+          <div style="margin-top:4px;font-size:11px;color:${p>=0?GREEN:RED}">${p>=0?'+':''}${p.toFixed(1)}% vs. cost</div>
+        </div>
+      </div>
+
+      <div class="card mb-12">
+        <div class="section-lbl">Bag identity</div>
+        <div class="field-grid" style="margin-bottom:0">
+          ${[['Brand',bag.brand],['Model',bag.model],['Color',bag.color],['Material',bag.material],['Size',bag.size],['Hardware',bag.hardware],['Production year',bag.year],['Condition',bag.condition]]
+            .map(([k,v])=>`<div><div class="text-11 c-dark">${k}</div><div class="text-12 f500 c-deepest">${esc(v)||'—'}</div></div>`).join('')}
+        </div>
+      </div>
+
+      <div class="card mb-12">
+        <div class="section-lbl">Purchase details</div>
+        <div class="field-grid" style="margin-bottom:0">
+          ${[['Purchase price',fmt(bag.purchasePrice)],['Purchase date',dateLong(bag.purchaseDate)],['Purchased from',bag.retailer]]
+            .map(([k,v])=>`<div><div class="text-11 c-dark">${k}</div><div class="text-12 f500 c-deepest">${esc(v)||'—'}</div></div>`).join('')}
+        </div>
+      </div>
+
+      ${(bag.tags||[]).length?`<div class="card mb-12">
+        <div class="section-lbl">Tags</div>
+        <div class="flex gap-6" style="flex-wrap:wrap">${bag.tags.map(t=>`<span class="tag-pill on">${esc(t)}</span>`).join('')}</div>
+      </div>`:''}
+
+      ${bag.notes?`<div class="card">
+        <div class="section-lbl">Notes</div>
+        <div style="background:#FBEAF0;border-radius:8px;padding:10px 12px;font-size:12px;color:#72243E;line-height:1.7">${esc(bag.notes)}</div>
+      </div>`:''}`;
+  }
+
+  return `
+  <div class="topbar">
+    <div><div class="tb-title">My collection</div>
+    <div class="tb-sub">${bags.length} bag${bags.length!==1?'s':''} tracked</div></div>
+    <div class="flex gap-8">
+      <button class="btn btn-ghost" onclick="aiRefreshValues()" ${S.aiRefreshing||!bags.length?'disabled':''}>
+        <i class="ti ti-${S.aiRefreshing?'loader-2 spin':'sparkles'}"></i> ${S.aiRefreshing?'Updating…':'Refresh values with AI'}
+      </button>
+      <button class="btn btn-primary" onclick="go('add-bag')"><i class="ti ti-plus"></i> Add bag</button>
+    </div>
+  </div>
+  <div id="col-layout">
+    <div class="col-list-panel">
+      <div style="padding:14px 14px 10px;border-bottom:.5px solid #F4C0D1">
+        <div class="search-box">
+          <i class="ti ti-search" style="font-size:15px;color:#993556"></i>
+          <input value="${esc(S.colSearch)}" oninput="colSearch(this.value)" placeholder="Search bags…">
+        </div>
+        <div class="flex gap-6" style="flex-wrap:wrap">
+          ${brands.map(br=>`<button class="chip ${S.colBrandFilter===br?'active':''}" onclick="colFilter('${esc(br)}')">${esc(br)}</button>`).join('')}
+        </div>
+      </div>
+      <div class="col-list-scroll">
+        ${fil.length===0?`<div style="padding:20px;text-align:center;font-size:12px;color:#993556">No bags match.</div>`:
+          fil.map(b=>{const p=calcPct(b.currentValue,b.purchasePrice);return`
+            <div class="bag-item ${b.id===S.colSelected?'active':''}" onclick="colSelect('${esc(b.id)}')">
+              <div class="bag-thumb"><i class="ti ti-briefcase" style="font-size:20px;color:#993556"></i></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-12 f500 c-deepest nowrap">${esc(b.name)}</div>
+                <div class="text-11 c-dark">${esc(b.brand)} · ${esc(b.year)}</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0">
+                <div class="text-12 f500 c-deepest">${fmt(b.currentValue)}</div>
+                <div style="font-size:10px;color:${p>=0?GREEN:RED}">${p>=0?'+':''}${p.toFixed(1)}%</div>
+              </div>
+            </div>`;}).join('')}
+      </div>
+    </div>
+    <div class="col-detail-panel">${detail}</div>
+  </div>`;
+}
+
+function colSelect(id){S.colSelected=id;render();}
+function colSearch(v){S.colSearch=v;render();}
+function colFilter(v){S.colBrandFilter=v;render();}
+function colDeleteBag(id){if(!confirm('Remove this bag from your collection?'))return;S.bags=S.bags.filter(b=>b.id!==id);if(S.colSelected===id)S.colSelected=S.bags[0]?.id||null;saveBags();toast('Bag removed');render();}
+function colEditBag(id){S.editBag=S.bags.find(b=>b.id===id);const b=S.editBag;S.addForm={...b,purchasePrice:String(b.purchasePrice),currentValue:String(b.currentValue)};go('add-bag');}
+function colStartEdit(cur,id){$('col-val-display').style.display='none';$('col-val-edit').style.display='block';$('col-new-val').value=cur;}
+function colCancelEdit(){$('col-val-edit').style.display='none';$('col-val-display').style.display='block';}
+function colSaveVal(id){const v=Number($('col-new-val').value);S.bags=S.bags.map(b=>b.id===id?{...b,currentValue:v}:b);saveBags();toast('Value updated');render();}
+
+// ── ADD BAG ────────────────────────────────────────────────────────────────────
+function selOpts(arr,val,ph){
+  return `<option value="">${ph}</option>`+arr.map(v=>`<option ${v===val?'selected':''}>${esc(v)}</option>`).join('');
+}
+
+function renderAddBag(){
+  const f=S.addForm||{};
+  const isEdit=!!S.editBag;
+  const previewPct=f.purchasePrice&&f.currentValue?((Number(f.currentValue)-Number(f.purchasePrice))/Number(f.purchasePrice)*100):null;
+
+  return `
+  <div class="topbar">
+    <div class="flex items-center gap-14">
+      <div style="width:38px;height:38px;background:#D4537E;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="ti ti-briefcase" style="color:#FBEAF0;font-size:18px"></i></div>
+      <div>
+        <div style="font-size:15px;font-weight:500;color:#4B1528">${isEdit?'Edit bag':'Add a bag to collection'}</div>
+        <div class="text-12 c-dark">Fill in the details to ${isEdit?'update':'start'} tracking value</div>
+      </div>
+    </div>
+    <button class="btn btn-ghost" onclick="addCancel()"><i class="ti ti-arrow-left" style="font-size:13px"></i> Back</button>
+  </div>
+  <div id="add-layout">
+    <div class="add-form">
+      <div class="section-lbl">Bag identity</div>
+      <div class="field-grid">
+        <div class="field"><label>Brand</label><div class="sel-wrap"><select class="inp" onchange="addSet('brand',this.value)">${selOpts(BRANDS,f.brand||'','Select brand')}</select></div></div>
+        <div class="field"><label>Model name</label><input class="inp" value="${esc(f.model||'')}" oninput="addSet('model',this.value)" placeholder="e.g. Birkin 25"></div>
+      </div>
+      <div class="field-grid">
+        <div class="field"><label>Display name (optional)</label><input class="inp" value="${esc(f.name||'')}" oninput="addSet('name',this.value)" placeholder="Auto-generated if blank"></div>
+        <div class="field"><label>Color</label><input class="inp" value="${esc(f.color||'')}" oninput="addSet('color',this.value)" placeholder="e.g. Noir, Rose Sakura"></div>
+      </div>
+      <div class="field-grid">
+        <div class="field"><label>Material</label><div class="sel-wrap"><select class="inp" onchange="addSet('material',this.value)">${selOpts(MATERIALS,f.material||'','Select material')}</select></div></div>
+        <div class="field"><label>Size</label><input class="inp" value="${esc(f.size||'')}" oninput="addSet('size',this.value)" placeholder="e.g. 25cm, Small"></div>
+      </div>
+      <div class="field-grid">
+        <div class="field"><label>Hardware</label><div class="sel-wrap"><select class="inp" onchange="addSet('hardware',this.value)">${selOpts(HARDWARE,f.hardware||'','Select hardware')}</select></div></div>
+        <div class="field"><label>Production year</label><input class="inp" value="${esc(f.year||'')}" oninput="addSet('year',this.value)" placeholder="e.g. 2022"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-lbl">Purchase details</div>
+      <div class="field-grid">
+        <div class="field"><label>Purchase price ($)</label><input class="inp" type="number" value="${esc(f.purchasePrice||'')}" oninput="addSet('purchasePrice',this.value)" placeholder="0"></div>
+        <div class="field"><label>Purchase date</label><input class="inp" type="date" value="${esc(f.purchaseDate||todayStr())}" oninput="addSet('purchaseDate',this.value)"></div>
+      </div>
+      <div class="field-grid">
+        <div class="field"><label>Purchased from</label><div class="sel-wrap"><select class="inp" onchange="addSet('retailer',this.value)">${selOpts(RETAILERS,f.retailer||'','Select retailer')}</select></div></div>
+        <div class="field"><label>Current market value ($)</label><input class="inp" type="number" value="${esc(f.currentValue||'')}" oninput="addSet('currentValue',this.value)" placeholder="Leave blank to use purchase price"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-lbl">Condition</div>
+      <div class="flex gap-8 mb-16">
+        ${CONDITIONS.map(c=>`<button class="cond-btn ${(f.condition||'Excellent')===c?'active':''}" onclick="addSetCond('${esc(c)}')">${esc(c)}</button>`).join('')}
+      </div>
+      <div class="divider"></div>
+      <div class="section-lbl">Tags</div>
+      <div class="flex gap-6 mb-16" style="flex-wrap:wrap">
+        ${ALL_TAGS.map(t=>`<button class="tag-pill ${(f.tags||[]).includes(t)?'on':''}" onclick="addToggleTag('${esc(t)}')">${esc(t)}</button>`).join('')}
+      </div>
+      <div class="divider"></div>
+      <div class="field"><label>Notes</label>
+        <textarea class="inp" rows="3" oninput="addSet('notes',this.value)" placeholder="Serial number, authenticity card, provenance, special story…">${esc(f.notes||'')}</textarea>
+      </div>
+    </div>
+    <div class="add-preview">
+      <div class="section-lbl">Live preview</div>
+      <div class="preview-card">
+        <div class="preview-img"><i class="ti ti-briefcase" style="font-size:32px;color:#993556"></i></div>
+        <div class="preview-info">
+          <div style="font-size:10px;font-weight:500;color:#993556;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${esc(f.brand||'Brand')}</div>
+          <div style="font-size:13px;font-weight:500;color:#4B1528;margin-bottom:8px">${esc(f.name||f.model||'Model name')}</div>
+          ${[['Color',f.color],['Material',f.material],['Hardware',f.hardware],['Size',f.size],['Year',f.year]].map(([k,v])=>`
+            <div class="flex justify-between" style="margin-bottom:3px">
+              <span class="text-11 c-dark">${k}</span>
+              <span class="text-11 f500 c-deepest">${esc(v)||'—'}</span>
+            </div>`).join('')}
+          <span class="badge badge-pink" style="margin-top:8px">${esc(f.condition||'Excellent')}</span>
+        </div>
+      </div>
+      <div style="background:#fff;border:.5px solid #F4C0D1;border-radius:8px;padding:12px;margin-bottom:12px">
+        <div class="text-11 c-dark mb-6">Purchase price</div>
+        <div style="font-size:18px;font-weight:500;color:#4B1528">${f.purchasePrice?fmt(Number(f.purchasePrice)):'—'}</div>
+        ${previewPct!==null?deltaBadge(previewPct):''}
+      </div>
+      <div class="text-11 c-dark" style="line-height:1.6">
+        <i class="ti ti-info-circle" style="font-size:13px;vertical-align:-2px;margin-right:4px"></i>
+        Market value estimates update weekly from authenticated resale platforms.
+      </div>
+    </div>
+  </div>
+  <div class="add-footer">
+    <span class="text-11 c-dark"><i class="ti ti-circle-check" style="font-size:13px;vertical-align:-2px;color:#D4537E;margin-right:4px"></i>${isEdit?'Editing existing bag':'New bag'}</span>
+    <div class="flex gap-8">
+      <button class="btn btn-ghost" onclick="addCancel()">Cancel</button>
+      <button class="btn btn-primary" onclick="addSave()"><i class="ti ti-check"></i> ${isEdit?'Save changes':'Add to collection'}</button>
+    </div>
+  </div>`;
+}
+
+function addSet(k,v){S.addForm={...S.addForm,[k]:v};render();}
+function addSetCond(c){S.addForm={...S.addForm,condition:c};render();}
+function addToggleTag(t){const tags=S.addForm.tags||[];S.addForm={...S.addForm,tags:tags.includes(t)?tags.filter(x=>x!==t):[...tags,t]};render();}
+function addCancel(){S.editBag=null;S.addForm=null;go('collection');}
+function addSave(){
+  const f=S.addForm;
+  if(!f.brand||!f.model||!f.purchasePrice){alert('Please fill in brand, model, and purchase price.');return;}
+  const price=Number(String(f.purchasePrice).replace(/[^0-9.]/g,''));
+  const curVal=f.currentValue?Number(String(f.currentValue).replace(/[^0-9.]/g,'')):price;
+  const isEdit=!!S.editBag;
+  const bag={...f,purchasePrice:price,currentValue:curVal,id:S.editBag?.id||'b'+Date.now(),name:f.name||(f.brand+' '+f.model)};
+  if(isEdit){S.bags=S.bags.map(b=>b.id===bag.id?bag:b);}
+  else{S.bags=[...S.bags,bag];}
+  S.colSelected=bag.id;
+  saveBags();S.editBag=null;S.addForm=null;
+  toast(isEdit?'Bag updated':'Bag added to collection');
+  go('collection');
+}
+
+// ── MARKET TRENDS ─────────────────────────────────────────────────────────────
+const QUICK_Q=['Hermès Birkin resale value 2025','Chanel Classic Flap price trend','Louis Vuitton resale market 2025','luxury bag investment returns 2025'];
+
+function renderTrends(){
+  const r=S.trendsResults;
+  return `
+  <div class="topbar">
+    <div><div class="tb-title">Market trends</div>
+    <div class="tb-sub">Live luxury resale data powered by web search</div></div>
+  </div>
+  <div class="content">
+    <div class="card mb-16">
+      <div class="section-lbl">Search market data</div>
+      <div class="flex gap-10 mb-12">
+        <input id="trends-q" class="inp" value="${esc(S.trendsQuery)}" oninput="S.trendsQuery=this.value" onkeydown="if(event.key==='Enter')trendsSearch()" style="flex:1" placeholder="e.g. Hermès Birkin resale 2025, Chanel price trend…">
+        <button class="btn btn-primary" onclick="trendsSearch()" ${S.trendsLoading?'disabled':''}>
+          <i class="ti ti-${S.trendsLoading?'loader-2 spin':'search'}"></i> ${S.trendsLoading?'Searching…':'Search'}
+        </button>
+      </div>
+      <div class="flex gap-6" style="flex-wrap:wrap">
+        ${QUICK_Q.map(q=>`<button class="tag-pill" onclick="trendsQuick('${esc(q)}')">${esc(q)}</button>`).join('')}
+      </div>
+    </div>
+    ${S.trendsLoading?`<div class="card flex items-center gap-12 c-dark"><i class="ti ti-loader-2 spin" style="font-size:20px"></i> Searching live resale market data…</div>`:''}
+    ${S.trendsError?`<div class="card" style="color:#A32D2D"><i class="ti ti-alert-circle" style="font-size:16px;margin-right:8px"></i>${esc(S.trendsError)}</div>`:''}
+    ${r?`
+      <div class="grid-3 mb-14">
+        ${[
+          {l:'Price range',v:r.priceRange,ic:'currency-dollar',col:''},
+          {l:'Price trend',v:r.trend,ic:'trending-up',col:r.trend&&r.trend.startsWith('+')?GREEN:RED},
+          {l:'Market outlook',v:r.outlook,ic:'chart-bar',col:r.outlook==='bullish'?GREEN:r.outlook==='bearish'?RED:ROSE_DARK}
+        ].map(s=>`<div class="stat-card">
+          <div class="stat-lbl">${s.l}</div>
+          <div class="flex items-center gap-8" style="margin-top:4px">
+            <i class="ti ti-${s.ic}" style="font-size:20px;color:${s.col||ROSE}"></i>
+            <span style="font-size:16px;font-weight:500;color:${s.col||ROSE_DEEPEST}">${esc(s.v||'—')}</span>
+          </div></div>`).join('')}
+      </div>
+      <div class="card mb-14">
+        <div class="section-lbl">Market summary</div>
+        <p style="font-size:13px;color:#4B1528;line-height:1.7;margin-bottom:14px">${esc(r.summary||'')}</p>
+        <div class="section-lbl">Key factors</div>
+        ${(r.keyFactors||[]).map(f=>`<div class="flex gap-10 items-start mb-8">
+          <div style="width:6px;height:6px;border-radius:50%;background:#D4537E;flex-shrink:0;margin-top:5px"></div>
+          <span class="text-13 c-deepest">${esc(f)}</span></div>`).join('')}
+      </div>
+      ${(r.sources||[]).length?`<div class="card"><div class="section-lbl">Sources</div>
+        ${r.sources.map(s=>`<div class="text-12 c-dark mb-6"><i class="ti ti-link" style="font-size:12px;margin-right:6px"></i>${esc(s)}</div>`).join('')}
+      </div>`:''}
+    `:''}
+    ${!S.trendsLoading&&!r&&!S.trendsError?emptyState('chart-line','Search for market data','Enter a bag model or brand above to get live resale price trends, market outlook, and key value drivers.'):''}
+  </div>`;
+}
+
+async function trendsSearch(){
+  const q=S.trendsQuery.trim();if(!q)return;
+  S.trendsLoading=true;S.trendsError=null;S.trendsResults=null;render();
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Search for current luxury handbag resale market data about: "${q}". Provide a concise market summary. Respond ONLY with a valid JSON object (no markdown, no backticks) with keys: summary (2-3 sentences), priceRange (string), trend (string like "+12% YoY"), outlook ("bullish"|"bearish"|"stable"), keyFactors (array of strings max 4), sources (array of strings).`}]})});
+    const data=await res.json();
+    const text=(data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
+    S.trendsResults=JSON.parse(text.replace(/```json|```/g,'').trim());
+  }catch(e){S.trendsError='Unable to fetch market data. Please try again.';}
+  S.trendsLoading=false;render();
+}
+function trendsQuick(q){S.trendsQuery=q;trendsSearch();}
+
+// ── REPORTS ────────────────────────────────────────────────────────────────────
+function renderReports(){
+  const bags=S.bags;
+  const tv=bags.reduce((a,b)=>a+(b.currentValue||0),0);
+  const tc=bags.reduce((a,b)=>a+(b.purchasePrice||0),0);
+  const gain=tv-tc;
+  const gainPct=tc>0?(gain/tc)*100:0;
+  const topBag=[...bags].sort((a,b)=>calcPct(b.currentValue,b.purchasePrice)-calcPct(a.currentValue,a.purchasePrice))[0];
+  const byBrand=bags.reduce((a,b)=>{a[b.brand]=(a[b.brand]||0)+(b.currentValue||0);return a;},{});
+  const r=S.reportsReport;
+
+  return `
+  <div class="topbar">
+    <div><div class="tb-title">Reports</div><div class="tb-sub">Portfolio analysis & AI-generated insights</div></div>
+    <button class="btn btn-primary" onclick="reportsGenerate()" ${S.reportsLoading||!bags.length?'disabled':''}>
+      <i class="ti ti-${S.reportsLoading?'loader-2 spin':'sparkles'}"></i> ${S.reportsLoading?'Generating…':'Generate AI report'}
+    </button>
+  </div>
+  <div class="content">
+    <div class="grid-4 mb-20">
+      ${[
+        {l:'Portfolio value',v:fmt(tv),col:''},
+        {l:'Total cost basis',v:fmt(tc),col:''},
+        {l:'Total gain / loss',v:fmt(gain),col:gain>=0?GREEN:RED},
+        {l:'Overall appreciation',v:fmtPct(gainPct),col:gainPct>=0?GREEN:RED}
+      ].map(s=>`<div class="stat-card"><div class="stat-lbl">${s.l}</div><div class="stat-val" style="${s.col?'color:'+s.col:''}">${s.v}</div></div>`).join('')}
+    </div>
+    <div class="grid-2 mb-14">
+      <div class="card">
+        <div class="section-lbl">Collection breakdown</div>
+        ${bags.map(b=>{const p=calcPct(b.currentValue,b.purchasePrice);return`
+          <div class="flex items-center gap-10 mb-10">
+            <div class="flex-1 min-w-0">
+              <div class="text-12 f500 c-deepest nowrap">${esc(b.name)}</div>
+              <div class="text-11 c-dark">${esc(b.brand)}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div class="text-12 f500 c-deepest">${fmt(b.currentValue)}</div>
+              <div style="font-size:11px;color:${p>=0?GREEN:RED}">${p>=0?'+':''}${p.toFixed(1)}%</div>
+            </div>
+          </div>`;}).join('')}
+      </div>
+      <div class="card">
+        <div class="section-lbl">By brand</div>
+        ${Object.entries(byBrand).sort((a,b)=>b[1]-a[1]).map(([br,val])=>{const p=tv>0?(val/tv)*100:0;return`
+          <div class="flex items-center gap-8 text-12 mb-10">
+            <span style="width:90px;color:#993556;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(br)}</span>
+            <div style="flex:1;height:6px;background:#FBEAF0;border-radius:3px"><div style="width:${p.toFixed(0)}%;height:100%;background:#D4537E;border-radius:3px"></div></div>
+            <span class="f500 c-deepest" style="min-width:50px;text-align:right">${fmt(val)}</span>
+          </div>`;}).join('')}
+        ${topBag?`<div class="divider"></div>
+          <div class="text-11 c-dark mb-6">Top performer</div>
+          <div class="text-13 f500 c-deepest">${esc(topBag.name)}</div>
+          <div style="margin-top:4px">${deltaBadge(calcPct(topBag.currentValue,topBag.purchasePrice))}</div>`:''}
+      </div>
+    </div>
+    ${S.reportsLoading?`<div class="card flex items-center gap-12 c-dark"><i class="ti ti-loader-2 spin" style="font-size:20px"></i> Analysing your portfolio and fetching market data…</div>`:''}
+    ${r?`<div class="card">
+      <div class="flex items-center gap-8 mb-14">
+        <i class="ti ti-sparkles" style="font-size:18px;color:#D4537E"></i>
+        <span class="text-14 f500 c-deepest">AI Portfolio Analysis</span>
+      </div>
+      <p style="font-size:13px;color:#4B1528;line-height:1.7;margin-bottom:14px">${esc(r.executiveSummary||'')}</p>
+      <div class="grid-2 mb-14">
+        <div>
+          <div style="font-size:11px;font-weight:500;color:#3B6D11;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Strengths</div>
+          ${(r.strengths||[]).map(s=>`<div class="flex gap-8 mb-6"><i class="ti ti-circle-check" style="font-size:14px;color:#3B6D11;flex-shrink:0;margin-top:1px"></i><span class="text-12 c-deepest">${esc(s)}</span></div>`).join('')}
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:500;color:#A32D2D;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Risks</div>
+          ${(r.risks||[]).map(s=>`<div class="flex gap-8 mb-6"><i class="ti ti-alert-triangle" style="font-size:14px;color:#A32D2D;flex-shrink:0;margin-top:1px"></i><span class="text-12 c-deepest">${esc(s)}</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="section-lbl">Recommendations</div>
+      ${(r.recommendations||[]).map(s=>`<div class="flex gap-8 mb-6"><i class="ti ti-arrow-right" style="font-size:14px;color:#D4537E;flex-shrink:0;margin-top:1px"></i><span class="text-12 c-deepest">${esc(s)}</span></div>`).join('')}
+      ${r.marketNote?`<div style="margin-top:12px;padding:10px 12px;background:#FBEAF0;border-radius:8px;font-size:12px;color:#72243E"><i class="ti ti-globe" style="font-size:13px;margin-right:6px"></i>${esc(r.marketNote)}</div>`:''}
+    </div>`:''}
+    ${!S.reportsLoading&&!r&&bags.length?`<div class="card" style="text-align:center;padding:32px">
+      <i class="ti ti-sparkles" style="font-size:28px;color:#D4537E;display:block;margin-bottom:10px"></i>
+      <div class="text-13 c-dark">Click "Generate AI report" to get an AI-powered analysis of your portfolio with live market context.</div>
+    </div>`:''}
+  </div>`;
+}
+
+async function reportsGenerate(){
+  if(!S.bags.length)return;
+  S.reportsLoading=true;render();
+  try{
+    const summary=S.bags.map(b=>({name:b.name,brand:b.brand,purchasePrice:b.purchasePrice,currentValue:b.currentValue,year:b.year,condition:b.condition}));
+    const tv=S.bags.reduce((a,b)=>a+(b.currentValue||0),0);
+    const tc=S.bags.reduce((a,b)=>a+(b.purchasePrice||0),0);
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Generate a luxury bag portfolio analysis. Collection: ${JSON.stringify(summary)}. Total value: $${tv.toLocaleString()}. Cost: $${tc.toLocaleString()}. Search for current market conditions. Respond ONLY with a valid JSON object (no markdown, no backticks): { "executiveSummary":"...", "strengths":["...","...","..."], "risks":["...","..."], "recommendations":["...","...","..."], "marketNote":"..." }`}]})});
+    const data=await res.json();
+    const text=(data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
+    S.reportsReport=JSON.parse(text.replace(/```json|```/g,'').trim());
+  }catch(e){S.reportsReport={executiveSummary:'Report generation encountered an error. Please try again.',strengths:[],risks:[],recommendations:[],marketNote:''};}
+  S.reportsLoading=false;render();
+}
+
+// ── PRICE ALERTS ──────────────────────────────────────────────────────────────
+function renderAlerts(){
+  const bags=S.bags;
+  const enriched=S.alerts.map(a=>{
+    const bag=bags.find(b=>b.id===a.bagId);if(!bag)return null;
+    const triggered=a.type==='above'?bag.currentValue>=a.targetPrice:bag.currentValue<=a.targetPrice;
+    return{...a,bag,triggered};
+  }).filter(Boolean);
+  const f=S.alertForm;
+
+  const addForm=S.alertAdding?`<div class="card mb-16">
+    <div class="text-14 f500 c-deepest mb-14">Create price alert</div>
+    <div class="field-grid-3">
+      <div class="field"><label>Bag</label><div class="sel-wrap"><select class="inp" onchange="alertSet('bagId',this.value)">
+        <option value="">Select bag</option>
+        ${bags.map(b=>`<option value="${esc(b.id)}" ${f.bagId===b.id?'selected':''}>${esc(b.name)}</option>`).join('')}
+      </select></div></div>
+      <div class="field"><label>Alert when value is</label><div class="sel-wrap"><select class="inp" onchange="alertSet('type',this.value)">
+        <option value="above" ${f.type==='above'?'selected':''}>Above target ($)</option>
+        <option value="below" ${f.type==='below'?'selected':''}>Below target ($)</option>
+      </select></div></div>
+      <div class="field"><label>Target price ($)</label><input class="inp" type="number" value="${esc(f.targetPrice)}" oninput="alertSet('targetPrice',this.value)" placeholder="e.g. 30000"></div>
+    </div>
+    ${f.bagId?`<div class="text-12 c-dark mb-14">Current value: ${fmt(bags.find(b=>b.id===f.bagId)?.currentValue||0)}</div>`:''}
+    <div class="flex gap-8">
+      <button class="btn btn-primary" onclick="alertAdd()"><i class="ti ti-bell"></i> Create alert</button>
+      <button class="btn btn-ghost" onclick="S.alertAdding=false;render()">Cancel</button>
+    </div>
+  </div>`:'';
+
+  const list=enriched.length===0
+    ?emptyState('bell','No alerts yet','Set a price target for any bag to get notified when the value crosses your threshold.',`<button class="btn btn-primary" onclick="S.alertAdding=true;render()"><i class="ti ti-plus"></i> Create alert</button>`)
+    :enriched.map(a=>`
+      <div class="card flex items-center gap-14 mb-10" style="border-color:${a.triggered?GREEN_MID:BLUSH_MID};background:${a.triggered?GREEN_BG:'#fff'}">
+        <div style="width:40px;height:40px;border-radius:8px;background:${a.triggered?GREEN_MID:BLUSH};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="ti ti-bell${a.triggered?'-ringing':''}" style="font-size:20px;color:${a.triggered?GREEN:ROSE}"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-13 f500 c-deepest">${esc(a.bag.name)}</div>
+          <div class="text-12 c-dark" style="margin-top:2px">Alert when value is <strong>${a.type}</strong> ${fmt(a.targetPrice)} · Current: ${fmt(a.bag.currentValue)}</div>
+        </div>
+        ${a.triggered?`<span class="badge badge-green-mid"><i class="ti ti-circle-check" style="font-size:10px;margin-right:4px"></i>Triggered</span>`:''}
+        <div class="flex gap-6 flex-shrink-0">
+          ${a.triggered?`<button class="btn btn-ghost btn-sm" onclick="alertDismiss('${esc(a.id)}')">Dismiss</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="alertDelete('${esc(a.id)}')"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>`).join('');
+
+  return `
+  <div class="topbar">
+    <div><div class="tb-title">Price alerts</div>
+    <div class="tb-sub">${enriched.filter(a=>a.triggered).length} triggered · ${enriched.length} total</div></div>
+    <button class="btn btn-primary" onclick="S.alertAdding=true;render()"><i class="ti ti-plus"></i> New alert</button>
+  </div>
+  <div class="content">${addForm}${list}</div>`;
+}
+
+function alertSet(k,v){S.alertForm={...S.alertForm,[k]:v};render();}
+function alertAdd(){
+  const f=S.alertForm;if(!f.bagId||!f.targetPrice)return;
+  const bag=S.bags.find(b=>b.id===f.bagId);
+  const target=Number(f.targetPrice);
+  const triggered=f.type==='above'?bag.currentValue>=target:bag.currentValue<=target;
+  S.alerts=[...S.alerts,{...f,id:'a'+Date.now(),targetPrice:target,triggered,createdAt:todayStr()}];
+  saveAlerts();S.alertAdding=false;S.alertForm={bagId:'',type:'above',targetPrice:''};
+  toast('Price alert created');render();
+}
+function alertDismiss(id){S.alerts=S.alerts.map(a=>a.id===id?{...a,triggered:false}:a);saveAlerts();render();}
+function alertDelete(id){S.alerts=S.alerts.filter(a=>a.id!==id);saveAlerts();toast('Alert removed');render();}
+
+// ── WISHLIST ──────────────────────────────────────────────────────────────────
+function renderWishlist(){
+  const f=S.wishForm;
+  const addForm=S.wishAdding?`<div class="card mb-16">
+    <div class="text-14 f500 c-deepest mb-14">Add to wishlist</div>
+    <div class="field-grid">
+      <div class="field"><label>Brand</label><div class="sel-wrap"><select class="inp" onchange="wishSet('brand',this.value)">
+        ${['','...'].concat(BRANDS).filter((v,i)=>i===0||BRANDS.includes(v)).map(v=>v===''?`<option value="">Select brand</option>`:`<option ${f.brand===v?'selected':''}>${esc(v)}</option>`).join('')}
+        ${BRANDS.map(v=>`<option ${f.brand===v?'selected':''}>${esc(v)}</option>`).join('')}
+      </select></div></div>
+      <div class="field"><label>Model</label><input class="inp" value="${esc(f.model)}" oninput="wishSet('model',this.value)" placeholder="e.g. Kelly 28"></div>
+    </div>
+    <div class="field-grid">
+      <div class="field"><label>Color</label><input class="inp" value="${esc(f.color)}" oninput="wishSet('color',this.value)" placeholder="e.g. Rouge Casaque"></div>
+      <div class="field"><label>Max budget ($)</label><input class="inp" type="number" value="${esc(f.maxBudget)}" oninput="wishSet('maxBudget',this.value)" placeholder="0"></div>
+    </div>
+    <div class="field"><label>Notes</label><textarea class="inp" rows="2" oninput="wishSet('notes',this.value)" placeholder="Preferred condition, year, any other details…">${esc(f.notes)}</textarea></div>
+    <div class="flex gap-8" style="margin-top:14px">
+      <button class="btn btn-primary" onclick="wishAdd()"><i class="ti ti-bookmark"></i> Save to wishlist</button>
+      <button class="btn btn-ghost" onclick="S.wishAdding=false;render()">Cancel</button>
+    </div>
+  </div>`:'';
+
+  const grid=S.wishlist.length===0
+    ?emptyState('bookmark','Wishlist is empty','Save bags you\'re dreaming of — track your budget and notes for future purchases.',`<button class="btn btn-primary" onclick="S.wishAdding=true;render()"><i class="ti ti-plus"></i> Add a bag</button>`)
+    :`<div class="wish-grid">${S.wishlist.map(w=>`
+      <div class="card">
+        <div class="flex justify-between items-start mb-12">
+          <div style="width:44px;height:44px;border-radius:8px;background:#FBEAF0;display:flex;align-items:center;justify-content:center">
+            <i class="ti ti-heart" style="font-size:20px;color:#D4537E"></i></div>
+          <button class="btn btn-danger btn-sm" onclick="wishDelete('${esc(w.id)}')"><i class="ti ti-x"></i></button>
+        </div>
+        <div style="font-size:10px;font-weight:500;color:#993556;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${esc(w.brand)}</div>
+        <div style="font-size:14px;font-weight:500;color:#4B1528;margin-bottom:8px">${esc(w.model)}</div>
+        ${[['Color',w.color],['Material',w.material],['Hardware',w.hardware]].filter(([,v])=>v).map(([k,v])=>`
+          <div class="flex justify-between mb-6">
+            <span class="text-11 c-dark">${k}</span>
+            <span class="text-11 f500 c-deepest">${esc(v)}</span>
+          </div>`).join('')}
+        ${w.maxBudget>0?`<div style="margin-top:10px;padding:6px 10px;background:#FBEAF0;border-radius:8px;display:flex;justify-content:space-between">
+          <span class="text-11 c-dark">Max budget</span>
+          <span class="text-12 f500 c-deepest">${fmt(w.maxBudget)}</span></div>`:''}
+        ${w.notes?`<div class="text-11 c-dark" style="margin-top:8px;line-height:1.5">${esc(w.notes)}</div>`:''}
+        <div style="margin-top:10px;font-size:10px;color:#ED93B1">Added ${dateShort(w.addedAt)}</div>
+      </div>`).join('')}</div>`;
+
+  return `
+  <div class="topbar">
+    <div><div class="tb-title">Wishlist</div>
+    <div class="tb-sub">${S.wishlist.length} bag${S.wishlist.length!==1?'s':''} saved</div></div>
+    <button class="btn btn-primary" onclick="S.wishAdding=true;render()"><i class="ti ti-plus"></i> Add to wishlist</button>
+  </div>
+  <div class="content">${addForm}${grid}</div>`;
+}
+
+function wishSet(k,v){S.wishForm={...S.wishForm,[k]:v};render();}
+function wishAdd(){
+  const f=S.wishForm;if(!f.brand||!f.model)return;
+  S.wishlist=[...S.wishlist,{...f,id:'w'+Date.now(),maxBudget:Number(f.maxBudget)||0,addedAt:todayStr()}];
+  saveWish();S.wishAdding=false;S.wishForm={brand:'',model:'',color:'',material:'',hardware:'',maxBudget:'',notes:''};
+  toast('Added to wishlist');render();
+}
+function wishDelete(id){S.wishlist=S.wishlist.filter(w=>w.id!==id);saveWish();toast('Removed from wishlist');render();}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+function renderSettings(){
+  const s=S.settings;
+  const tog=key=>`<div onclick="settingsTog('${key}')" class="toggle" style="background:${s[key]?ROSE:BLUSH_MID}">
+    <div class="toggle-knob" style="left:${s[key]?20:2}px"></div></div>`;
+
+  return `
+  <div class="topbar">
+    <div><div class="tb-title">Settings</div><div class="tb-sub">Manage your account and preferences</div></div>
+    <button class="btn btn-primary" onclick="settingsSave()"><i class="ti ti-check"></i> Save changes</button>
+  </div>
+  <div class="content">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card">
+        <div class="section-lbl">Profile</div>
+        <div class="field-grid">
+          <div class="field"><label>Display name</label><input id="s-name" class="inp" value="${esc(s.name||'')}" placeholder="Your name"></div>
+          <div class="field"><label>Email</label><input id="s-email" class="inp" value="${esc(s.email||'')}" placeholder="you@example.com"></div>
+        </div>
+        <div class="field" style="max-width:260px"><label>App name (shown in sidebar)</label>
+          <input id="s-appname" class="inp" value="${esc(s.appName||'')}" placeholder="Mary Katherine"></div>
+      </div>
+      <div class="card">
+        <div class="section-lbl">Display preferences</div>
+        <div class="field-grid">
+          <div class="field"><label>Currency</label><div class="sel-wrap"><select id="s-currency" class="inp">
+            ${['USD','EUR','GBP','JPY'].map(c=>`<option ${s.currency===c?'selected':''}>${c}</option>`).join('')}
+          </select></div></div>
+          <div class="field"><label>Plan</label><div class="sel-wrap"><select id="s-plan" class="inp">
+            ${['Free plan','Pro plan','Enterprise'].map(p=>`<option ${s.plan===p?'selected':''}>${p}</option>`).join('')}
+          </select></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-lbl">Notifications</div>
+        ${[
+          {k:'notifyAlerts',l:'Price alert notifications',s:'Get notified when a bag hits your target price'},
+          {k:'notifyMarket',l:'Weekly market digest',s:'Weekly summary of luxury resale market trends'},
+          {k:'notifyReports',l:'Monthly portfolio report',s:'Auto-generate a portfolio report at month end'}
+        ].map(({k,l,s:sub})=>`
+          <div class="flex justify-between items-center mb-14">
+            <div><div class="text-13 f500 c-deepest">${l}</div><div class="text-11 c-dark">${sub}</div></div>
+            ${tog(k)}
+          </div>`).join('')}
+      </div>
+      <div class="card" style="border-color:#F7C1C1">
+        <div class="section-lbl" style="color:#A32D2D">Danger zone</div>
+        <div class="text-13 c-deepest mb-12">These actions cannot be undone. Please be certain before proceeding.</div>
+        <button class="btn btn-danger" onclick="settingsClear()"><i class="ti ti-trash"></i> Clear all bags</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function settingsTog(k){S.settings={...S.settings,[k]:!S.settings[k]};render();}
+function settingsSave(){
+  S.settings={
+    ...S.settings,
+    name:$('s-name')?.value||S.settings.name,
+    email:$('s-email')?.value||S.settings.email,
+    appName:$('s-appname')?.value||S.settings.appName,
+    currency:$('s-currency')?.value||S.settings.currency,
+    plan:$('s-plan')?.value||S.settings.plan
+  };
+  saveSettings();toast('Settings saved');render();
+}
+function settingsClear(){
+  if(!confirm('Clear all collection data? This cannot be undone.'))return;
+  S.bags=[];saveBags();toast('Collection cleared');render();
+}
+
+// ── AI VALUE REFRESH ──────────────────────────────────────────────────────────
+async function aiRefreshValues(){
+  if(!S.bags.length||S.aiRefreshing)return;
+  S.aiRefreshing=true;S.aiRefreshLog=[];render();
+
+  // Build a single prompt listing all bags so we make one API call
+  const bagList=S.bags.map((b,i)=>`${i+1}. ${b.brand} ${b.model}${b.color?' in '+b.color:''}${b.size?', '+b.size:''}${b.year?', '+b.year:''} (condition: ${b.condition})`).join('\n');
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:2000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Search the web for current 2025 resale market values for each of these luxury handbags. For each bag, search authenticated resale platforms (Vestiaire Collective, The RealReal, Fashionphile, 1stDibs) to find realistic current resale price ranges.
+
+Bags to research:
+${bagList}
+
+Respond ONLY with a valid JSON array (no markdown, no backticks, no explanation) where each element matches the bag order above:
+[
+  {"index":1,"estimatedValue":25000,"priceRange":"$23,000–$27,000","source":"Vestiaire Collective / Fashionphile","confidence":"high"},
+  ...
+]
+
+Use realistic resale market prices (not retail). If you cannot find data for a bag, use null for estimatedValue and explain briefly in source.`}]
+      })
+    });
+
+    const data=await res.json();
+    const text=(data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
+    const clean=text.replace(/```json|```/g,'').trim();
+    const results=JSON.parse(clean);
+
+    // Apply updates and build log
+    const log=[];
+    results.forEach(r=>{
+      const bag=S.bags[r.index-1];
+      if(!bag)return;
+      if(r.estimatedValue&&r.estimatedValue>0){
+        const oldVal=bag.currentValue;
+        const newVal=Math.round(r.estimatedValue);
+        S.bags=S.bags.map(b=>b.id===bag.id?{...b,currentValue:newVal,lastAiUpdate:todayStr()}:b);
+        log.push({name:bag.name,ok:true,oldVal,newVal,source:r.priceRange?(r.priceRange+' · '+r.source):r.source});
+      } else {
+        log.push({name:bag.name,ok:false,error:r.source||'No data found'});
+      }
+    });
+
+    saveBags();
+    S.aiRefreshLog=log;
+
+    // Re-evaluate alerts against new values
+    S.alerts=S.alerts.map(a=>{
+      const bag=S.bags.find(b=>b.id===a.bagId);
+      if(!bag)return a;
+      return{...a,triggered:a.type==='above'?bag.currentValue>=a.targetPrice:bag.currentValue<=a.targetPrice};
+    });
+    saveAlerts();
+
+    toast(`AI updated ${log.filter(l=>l.ok).length} of ${S.bags.length} bag values`);
+
+  }catch(e){
+    console.error(e);
+    toast('AI value refresh failed — please try again');
+  }
+
+  S.aiRefreshing=false;
+  // Navigate to dashboard to show the log
+  S.page='dashboard';
+  render();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+const PAGES={
+  dashboard:renderDashboard,
+  collection:renderCollection,
+  'add-bag':renderAddBag,
+  trends:renderTrends,
+  reports:renderReports,
+  alerts:renderAlerts,
+  wishlist:renderWishlist,
+  settings:renderSettings
+};
+
+function render(){
+  syncSidebar();
+  $('main').innerHTML=(PAGES[S.page]||renderDashboard)();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click',()=>go(el.dataset.page));
+});
+
+loadAll();
+render();
+</script>
+</body>
+</html>
