@@ -1,6 +1,6 @@
 # Mary Katherine — Luxury Bag Value Tracker
 
-`MK App.html` is the whole front end (HTML + CSS + vanilla JS, no build step). `server.mjs` is a small Node server that serves the page and proxies AI calls. Started as a claude.ai chat artifact, moved here.
+`index.html` is the whole front end (HTML + CSS + vanilla JS, no build step). `server.mjs` is a small Node server that serves the page and proxies AI calls. Started as a claude.ai chat artifact, moved here.
 
 ## Run
 `npm install`, copy `.env.example` to `.env` and add `ANTHROPIC_API_KEY`, then `npm start` and open http://localhost:3000. Without a key, everything except the AI features still works.

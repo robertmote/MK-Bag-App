@@ -1,4 +1,4 @@
-// Serves MK App.html and forwards its AI prompts to Claude, so the API key never reaches the browser.
+// Serves index.html and forwards its AI prompts to Claude, so the API key never reaches the browser.
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import Anthropic from '@anthropic-ai/sdk';
@@ -31,7 +31,7 @@ http.createServer(async (req, res) => {
   const send = (status, type, body) => { res.writeHead(status, { 'Content-Type': type }); res.end(body); };
   try {
     if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html')) {
-      return send(200, 'text/html; charset=utf-8', await readFile(new URL('./MK App.html', import.meta.url)));
+      return send(200, 'text/html; charset=utf-8', await readFile(new URL('./index.html', import.meta.url)));
     }
     if (req.method === 'POST' && req.url === '/api/ask') {
       let body = '';

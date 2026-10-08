@@ -145,6 +145,37 @@ textarea.inp{resize:none;line-height:1.5}
 
 /* ── Wish grid ── */
 .wish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+
+/* ── Phone ── */
+@media (max-width:768px){
+  body,#app{height:100dvh}
+  #app{flex-direction:column-reverse}
+  /* Sidebar becomes a scrollable bottom tab bar */
+  #sidebar{width:100%;flex-direction:row;border-right:none;border-top:.5px solid #F4C0D1;overflow-x:auto;padding-bottom:env(safe-area-inset-bottom)}
+  .sb-logo,.sb-footer,.nav-lbl{display:none}
+  .nav-section{display:contents}
+  .nav-item{flex-direction:column;gap:2px;font-size:10px;padding:8px 10px;margin:4px 2px;white-space:nowrap;flex-shrink:0;width:76px} /* fixed width leaves the 5th tab half-visible on a phone, hinting the bar scrolls */
+  .nav-item i{font-size:20px}
+  .topbar{height:auto;min-height:58px;padding:10px 16px;flex-wrap:wrap;gap:8px}
+  .content,.add-form,.col-detail-panel{padding:16px}
+  .grid-4{grid-template-columns:1fr 1fr}
+  .grid-3,.grid-2,.field-grid,.field-grid-3{grid-template-columns:1fr}
+  /* Stack the side-by-side panels */
+  #col-layout{flex-direction:column;overflow-y:auto}
+  .col-list-panel{width:auto;border-right:none;border-bottom:.5px solid #F4C0D1}
+  .col-list-scroll{max-height:240px}
+  .col-detail-panel{overflow:visible}
+  #add-layout{display:block;overflow-y:auto}
+  .add-form{overflow:visible;border-right:none;border-bottom:.5px solid #F4C0D1}
+  .add-preview{overflow:visible}
+  .add-footer{padding:10px 16px}
+  .cond-btn{flex:1 1 30%}
+  .flex:has(>.cond-btn){flex-wrap:wrap}
+  .card.flex{flex-wrap:wrap}
+  .card.flex>.flex-1{flex-basis:60%} /* badges/buttons drop to their own line instead of squeezing the text */
+  .inp,.search-box input{font-size:16px} /* stops iPhone zooming in on focus */
+  #toast{left:16px;right:16px;bottom:84px}
+}
 </style>
 </head>
 <body>
@@ -272,6 +303,8 @@ const calcPct=(cur,cost)=>cost>0?((cur-cost)/cost)*100:0;
 
 // Calls Claude (with web search) through server.mjs, which holds the API key. Returns the JSON in Claude's reply.
 async function askClaude(prompt){
+  // Hosted copies (e.g. GitHub Pages) have no server.mjs, so there is nothing to call.
+  if(!['localhost','127.0.0.1'].includes(location.hostname))throw new Error('AI features only work when the app is running on your computer with "npm start".');
   let res;
   try{res=await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});}
   catch{throw new Error('Cannot reach the app server. Run "npm start" and open http://localhost:3000');}
@@ -321,6 +354,7 @@ function syncSidebar(){
     el.classList.toggle('active',active);
     const ic=el.querySelector('i');
     if(ic) ic.style.color=active?'#FBEAF0':'#993556';
+    if(active) el.scrollIntoView({block:'nearest',inline:'nearest'}); // keeps the active tab visible in the phone tab bar
   });
   const init=(S.settings.name||'SC').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   $('sb-avatar').textContent=init;
