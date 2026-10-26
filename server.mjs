@@ -34,9 +34,13 @@ http.createServer(async (req, res) => {
       return send(200, 'text/html; charset=utf-8', await readFile(new URL('./index.html', import.meta.url)));
     }
     if (req.method === 'POST' && req.url === '/api/ask') {
+      // Other websites can't send a JSON content type here without a CORS preflight (which we never answer),
+      // so this blocks them from spending your API credits via a hidden form in your browser.
+      if (!req.headers['content-type']?.startsWith('application/json')) return send(415, 'application/json', '{"error":"Expected JSON"}');
       let body = '';
       for await (const chunk of req) { body += chunk; if (body.length > 100_000) return send(413, 'application/json', '{"error":"Request too large"}'); }
-      const { prompt } = JSON.parse(body);
+      let prompt;
+      try { ({ prompt } = JSON.parse(body)); } catch { return send(400, 'application/json', '{"error":"Invalid JSON"}'); }
       if (typeof prompt !== 'string' || !prompt) return send(400, 'application/json', '{"error":"Missing prompt"}');
       return send(200, 'application/json', JSON.stringify({ text: await ask(prompt) }));
     }

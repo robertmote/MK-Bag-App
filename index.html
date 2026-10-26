@@ -20,7 +20,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sb-logo-sub{font-size:11px;color:#993556}
 .nav-section{padding:16px 12px 8px}
 .nav-lbl{font-size:10px;font-weight:500;color:#993556;letter-spacing:.08em;text-transform:uppercase;padding:0 8px;margin-bottom:6px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;font-size:13px;color:#72243E;user-select:none;transition:background .1s}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;font-size:13px;color:#72243E;user-select:none;transition:background .1s;border:none;background:none;font-family:inherit;width:100%;text-align:left}
+:focus-visible{outline:2px solid #D4537E;outline-offset:2px}
 .nav-item:hover{background:#F4C0D1}
 .nav-item.active{background:#D4537E;color:#FBEAF0}
 .nav-item i{font-size:17px;color:#993556;flex-shrink:0}
@@ -140,7 +141,7 @@ textarea.inp{resize:none;line-height:1.5}
 .preview-info{padding:12px}
 
 /* ── Settings toggles ── */
-.toggle{width:40px;height:22px;border-radius:11px;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s}
+.toggle{width:40px;height:22px;border-radius:11px;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s;border:none;padding:0}
 .toggle-knob{width:18px;height:18px;border-radius:9px;background:#fff;position:absolute;top:2px;transition:left .2s}
 
 /* ── Wish grid ── */
@@ -192,23 +193,23 @@ textarea.inp{resize:none;line-height:1.5}
     </div>
     <div class="nav-section">
       <div class="nav-lbl">Overview</div>
-      <div class="nav-item" data-page="dashboard"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
-      <div class="nav-item" data-page="collection"><i class="ti ti-briefcase"></i> My collection</div>
-      <div class="nav-item" data-page="trends"><i class="ti ti-chart-line"></i> Market trends</div>
+      <button type="button" class="nav-item" data-page="dashboard"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+      <button type="button" class="nav-item" data-page="collection"><i class="ti ti-briefcase"></i> My collection</button>
+      <button type="button" class="nav-item" data-page="trends"><i class="ti ti-chart-line"></i> Market trends</button>
     </div>
     <div class="nav-section">
       <div class="nav-lbl">Manage</div>
-      <div class="nav-item" data-page="add-bag"><i class="ti ti-plus"></i> Add a bag</div>
-      <div class="nav-item" data-page="reports"><i class="ti ti-file-text"></i> Reports</div>
-      <div class="nav-item" data-page="alerts"><i class="ti ti-bell"></i> Price alerts</div>
-      <div class="nav-item" data-page="wishlist"><i class="ti ti-bookmark"></i> Wishlist</div>
+      <button type="button" class="nav-item" data-page="add-bag"><i class="ti ti-plus"></i> Add a bag</button>
+      <button type="button" class="nav-item" data-page="reports"><i class="ti ti-file-text"></i> Reports</button>
+      <button type="button" class="nav-item" data-page="alerts"><i class="ti ti-bell"></i> Price alerts</button>
+      <button type="button" class="nav-item" data-page="wishlist"><i class="ti ti-bookmark"></i> Wishlist</button>
     </div>
     <div class="nav-section">
       <div class="nav-lbl">Account</div>
-      <div class="nav-item" data-page="settings"><i class="ti ti-settings"></i> Settings</div>
+      <button type="button" class="nav-item" data-page="settings"><i class="ti ti-settings"></i> Settings</button>
     </div>
     <div class="sb-footer">
-      <div class="user-pill" onclick="go('settings')">
+      <div class="user-pill" role="button" tabindex="0" aria-label="Settings" onclick="go('settings')">
         <div class="avatar" id="sb-avatar">SC</div>
         <div style="flex:1;min-width:0">
           <div class="text-12 f500 c-deepest nowrap" id="sb-name">Mary Katherine</div>
@@ -220,7 +221,7 @@ textarea.inp{resize:none;line-height:1.5}
   </nav>
   <div id="main"></div>
 </div>
-<div id="toast" class="flex items-center gap-10">
+<div id="toast" class="flex items-center gap-10" role="status" aria-live="polite">
   <i class="ti ti-circle-check" style="font-size:16px"></i>
   <span id="toast-msg"></span>
 </div>
@@ -248,8 +249,8 @@ const SEED_BAGS=[
   {id:'b5',name:'Constance 24 Étoupe',brand:'Hermès',model:'Constance 24',color:'Étoupe',material:'Epsom leather',size:'24 cm',hardware:'Palladium (PHW)',year:'2020',condition:'Excellent',retailer:'Boutique (retail)',purchaseDate:'2020-02-02',purchasePrice:17200,notes:'Full set. H clasp in perfect condition. Comes with strap.',tags:['Investment piece','With receipt','With dustbag','With box'],currentValue:22000}
 ];
 const SEED_ALERTS=[
-  {id:'a1',bagId:'b1',type:'above',targetPrice:30000,triggered:false,createdAt:'2024-01-01'},
-  {id:'a2',bagId:'b2',type:'above',targetPrice:11000,triggered:true,createdAt:'2024-01-01'}
+  {id:'a1',bagId:'b1',type:'above',targetPrice:30000,createdAt:'2024-01-01'},
+  {id:'a2',bagId:'b2',type:'above',targetPrice:11000,createdAt:'2024-01-01'}
 ];
 const SEED_WISHLIST=[
   {id:'w1',brand:'Hermès',model:'Kelly 28',color:'Rouge Casaque',material:'Epsom leather',hardware:'Gold (GHW)',maxBudget:25000,notes:'Dream bag — any year.',addedAt:'2024-03-01'},
@@ -269,7 +270,6 @@ let S={
   reportsReport:null,reportsLoading:false,
   alertAdding:false,alertForm:{bagId:'',type:'above',targetPrice:''},
   wishAdding:false,wishForm:{brand:'',model:'',color:'',material:'',hardware:'',maxBudget:'',notes:''},
-  colEditingVal:false,
   aiRefreshing:false,
   aiRefreshLog:[]
 };
@@ -295,11 +295,23 @@ const $=id=>document.getElementById(id);
 const cur=()=>S.settings.currency||'USD';
 const fmt=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:cur(),minimumFractionDigits:0,maximumFractionDigits:0});
 const fmtPct=n=>(n>=0?'+':'')+n.toFixed(1)+'%';
-const todayStr=()=>new Date().toISOString().split('T')[0];
-const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const dateShort=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch{return d||'—';}};
-const dateLong=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});}catch{return d||'—';}};
+const todayStr=()=>new Date().toLocaleDateString('en-CA'); // local YYYY-MM-DD (toISOString is UTC, i.e. tomorrow on US evenings)
+const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmtDate=(d,month)=>{const t=new Date(d+'T12:00:00');return d&&!isNaN(t)?t.toLocaleDateString('en-US',{month,day:'numeric',year:'numeric'}):'—';};
+const dateShort=d=>fmtDate(d,'short'),dateLong=d=>fmtDate(d,'long');
 const calcPct=(cur,cost)=>cost>0?((cur-cost)/cost)*100:0;
+const pctColor=p=>p>=0?GREEN:RED;
+const arr=x=>Array.isArray(x)?x:[]; // AI replies are untrusted JSON; lists may be missing or the wrong type
+const totals=()=>{const v=S.bags.reduce((a,b)=>a+(b.currentValue||0),0),c=S.bags.reduce((a,b)=>a+(b.purchasePrice||0),0);return{v,c,pct:calcPct(v,c)};};
+const byGain=()=>[...S.bags].sort((a,b)=>calcPct(b.currentValue,b.purchasePrice)-calcPct(a.currentValue,a.purchasePrice));
+const brandTotals=()=>Object.entries(S.bags.reduce((a,b)=>{a[b.brand]=(a[b.brand]||0)+(b.currentValue||0);return a;},{})).sort((a,b)=>b[1]-a[1]);
+// An alert fires while its bag's value is past the target. Dismiss silences it until the value changes again.
+function alertFiring(a){
+  const b=S.bags.find(x=>x.id===a.bagId);
+  return !!b&&(a.type==='above'?b.currentValue>=a.targetPrice:b.currentValue<=a.targetPrice)&&b.currentValue!==a.dismissedValue;
+}
+const refreshBtn=()=>`<button class="btn btn-ghost" onclick="aiRefreshValues()" ${S.aiRefreshing||!S.bags.length?'disabled':''}>
+  <i class="ti ti-${S.aiRefreshing?'loader-2 spin':'sparkles'}"></i> ${S.aiRefreshing?'Updating values…':'Refresh values with AI'}</button>`;
 
 // Calls Claude (with web search) through server.mjs, which holds the API key. Returns the JSON in Claude's reply.
 async function askClaude(prompt){
@@ -332,16 +344,18 @@ function emptyState(icon,title,sub,btn=''){
 
 let toastTid;
 function toast(msg){
-  $('toast-msg').textContent=msg;
   const t=$('toast');
   t.style.display='flex';
+  $('toast-msg').textContent=msg; // set after showing, so screen readers announce the change
   clearTimeout(toastTid);
   toastTid=setTimeout(()=>t.style.display='none',3000);
 }
 
+// Opening "Add a bag" always starts a fresh form; colEditBag() opens it in edit mode without going through here.
 function go(page){
   S.page=page;
-  if(page==='add-bag'&&!S.editBag){
+  if(page==='add-bag'){
+    S.editBag=null;
     S.addForm={name:'',brand:'',model:'',color:'',material:'',size:'',hardware:'',year:'',condition:'Excellent',retailer:'',purchaseDate:todayStr(),purchasePrice:'',notes:'',tags:[],currentValue:''};
   }
   render();
@@ -352,6 +366,7 @@ function syncSidebar(){
   document.querySelectorAll('.nav-item').forEach(el=>{
     const active=el.dataset.page===S.page;
     el.classList.toggle('active',active);
+    active?el.setAttribute('aria-current','page'):el.removeAttribute('aria-current');
     const ic=el.querySelector('i');
     if(ic) ic.style.color=active?'#FBEAF0':'#993556';
     if(active) el.scrollIntoView({block:'nearest',inline:'nearest'}); // keeps the active tab visible in the phone tab bar
@@ -366,16 +381,14 @@ function syncSidebar(){
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 function renderDashboard(){
   const bags=S.bags;
-  const tv=bags.reduce((a,b)=>a+(b.currentValue||0),0);
-  const tc=bags.reduce((a,b)=>a+(b.purchasePrice||0),0);
-  const ap=tc>0?((tv-tc)/tc)*100:0;
-  const sorted=[...bags].sort((a,b)=>calcPct(b.currentValue,b.purchasePrice)-calcPct(a.currentValue,a.purchasePrice));
-  const trig=S.alerts.filter(a=>a.triggered);
+  const {v:tv,c:tc,pct:ap}=totals();
+  const trig=S.alerts.filter(alertFiring);
+  const lastAi=bags.map(b=>b.lastAiUpdate).filter(Boolean).sort().pop();
 
   const banner=trig.length?`<div class="alert-banner">
     <i class="ti ti-bell-ringing" style="font-size:16px"></i>
     <strong>${trig.length} price alert${trig.length>1?'s':''}</strong> triggered —
-    <span style="cursor:pointer;text-decoration:underline" onclick="go('alerts')">view alerts</span>
+    <span role="button" tabindex="0" style="cursor:pointer;text-decoration:underline" onclick="go('alerts')">view alerts</span>
   </div>`:'';
 
   if(!bags.length) return `
@@ -383,16 +396,12 @@ function renderDashboard(){
       <button class="btn btn-primary" onclick="go('add-bag')"><i class="ti ti-plus"></i> Add bag</button></div>
     <div class="content">${banner}${emptyState('briefcase','No bags yet','Add your first bag to start tracking your collection\'s value.',`<button class="btn btn-primary" onclick="go('add-bag')"><i class="ti ti-plus"></i> Add a bag</button>`)}</div>`;
 
-  const byBrand=bags.reduce((a,b)=>{a[b.brand]=(a[b.brand]||0)+(b.currentValue||0);return a;},{});
-
   return `
   <div class="topbar">
     <div><div class="tb-title">Portfolio overview</div>
-    <div class="tb-sub">Last updated ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div></div>
+    <div class="tb-sub">${lastAi?'Values last refreshed with AI '+dateLong(lastAi):'Values as entered'}</div></div>
     <div class="flex gap-8">
-      <button class="btn btn-ghost" onclick="aiRefreshValues()" ${S.aiRefreshing||!bags.length?'disabled':''}>
-        <i class="ti ti-${S.aiRefreshing?'loader-2 spin':'sparkles'}"></i> ${S.aiRefreshing?'Updating values…':'Refresh values with AI'}
-      </button>
+      ${refreshBtn()}
       <button class="btn btn-primary" onclick="go('add-bag')"><i class="ti ti-plus"></i> Add bag</button>
     </div>
   </div>
@@ -412,7 +421,7 @@ function renderDashboard(){
           <i class="ti ti-${l.ok?'circle-check':'alert-circle'}" style="font-size:14px;color:${l.ok?'#3B6D11':'#A32D2D'};flex-shrink:0"></i>
           <span class="text-12 c-deepest nowrap" style="min-width:180px">${esc(l.name)}</span>
           ${l.ok?`<span class="text-12 f500 c-deepest">${fmt(l.oldVal)} → ${fmt(l.newVal)}</span>
-            <span class="badge ${l.newVal>=l.oldVal?'badge-green':'badge-red'}" style="margin-left:4px">${l.newVal>=l.oldVal?'+':''}${(((l.newVal-l.oldVal)/l.oldVal)*100).toFixed(1)}%</span>
+            <span class="badge ${l.newVal>=l.oldVal?'badge-green':'badge-red'}" style="margin-left:4px">${fmtPct(calcPct(l.newVal,l.oldVal))}</span>
             <span class="text-11 c-dark" style="margin-left:8px;flex:1">${esc(l.source||'')}</span>`
           :`<span class="text-11" style="color:#A32D2D">${esc(l.error)}</span>`}
         </div>`).join('')}
@@ -421,7 +430,7 @@ function renderDashboard(){
       ${[
         {l:'Total portfolio value',v:fmt(tv),x:deltaBadge(ap)},
         {l:'Total bags tracked',v:bags.length,x:`<span class="badge badge-blush">in collection</span>`},
-        {l:'Avg. appreciation',v:fmtPct(ap),x:`<span class="text-11 c-dark">vs. purchase</span>`},
+        {l:'Overall appreciation',v:fmtPct(ap),x:`<span class="text-11 c-dark">vs. purchase</span>`},
         {l:'Total cost basis',v:fmt(tc),x:`<span class="text-11 c-dark">purchase prices</span>`}
       ].map(s=>`<div class="stat-card"><div class="stat-lbl">${s.l}</div><div class="stat-val">${s.v}</div><div style="margin-top:6px">${s.x}</div></div>`).join('')}
     </div>
@@ -429,9 +438,9 @@ function renderDashboard(){
       <div class="card">
         <div class="flex justify-between items-center mb-14">
           <span class="text-13 f500 c-deepest">Top performing bags</span>
-          <span class="text-11 c-rose" style="cursor:pointer" onclick="go('collection')">View all →</span>
+          <span role="button" tabindex="0" class="text-11 c-rose" style="cursor:pointer" onclick="go('collection')">View all →</span>
         </div>
-        ${sorted.slice(0,5).map(b=>{const p=calcPct(b.currentValue,b.purchasePrice);return`
+        ${byGain().slice(0,5).map(b=>{const p=calcPct(b.currentValue,b.purchasePrice);return`
           <div class="flex items-center gap-12 mb-10">
             <div class="bag-thumb" style="width:38px;height:38px"><i class="ti ti-briefcase" style="font-size:18px;color:#993556"></i></div>
             <div class="flex-1 min-w-0">
@@ -440,13 +449,13 @@ function renderDashboard(){
             </div>
             <div style="text-align:right">
               <div class="text-12 f500 c-deepest">${fmt(b.currentValue)}</div>
-              <div class="text-11" style="color:${p>=0?GREEN:RED}">${p>=0?'+':''}${p.toFixed(1)}%</div>
+              <div class="text-11" style="color:${pctColor(p)}">${fmtPct(p)}</div>
             </div>
           </div>`;}).join('')}
       </div>
       <div class="card">
         <div class="text-13 f500 c-deepest mb-14">By brand</div>
-        ${Object.entries(byBrand).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([br,val])=>{const p=tv>0?(val/tv)*100:0;return`
+        ${brandTotals().slice(0,5).map(([br,val])=>{const p=tv>0?(val/tv)*100:0;return`
           <div class="flex items-center gap-8 text-12 mb-10">
             <span style="width:80px;color:#993556;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(br)}</span>
             <div style="flex:1;height:6px;background:#FBEAF0;border-radius:3px"><div style="width:${p.toFixed(0)}%;height:100%;background:#D4537E;border-radius:3px"></div></div>
@@ -469,8 +478,10 @@ function renderDashboard(){
 function renderCollection(){
   const bags=S.bags;
   const brands=['All',...new Set(bags.map(b=>b.brand))];
+  if(!brands.includes(S.colBrandFilter)) S.colBrandFilter='All'; // the filtered brand's last bag was deleted
+  const q=S.colSearch.toLowerCase();
   const fil=bags.filter(b=>(S.colBrandFilter==='All'||b.brand===S.colBrandFilter)&&
-    (b.name.toLowerCase().includes(S.colSearch.toLowerCase())||b.brand.toLowerCase().includes(S.colSearch.toLowerCase())));
+    [b.name,b.brand,b.model,b.color].join(' ').toLowerCase().includes(q));
   if(!S.colSelected&&fil.length) S.colSelected=fil[0].id;
   const bag=bags.find(b=>b.id===S.colSelected);
 
@@ -498,7 +509,7 @@ function renderCollection(){
         </div>
         <div class="flex gap-8">
           <button class="btn btn-ghost btn-sm" onclick="colEditBag('${esc(bag.id)}')"><i class="ti ti-edit"></i> Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="colDeleteBag('${esc(bag.id)}')"><i class="ti ti-trash"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="colDeleteBag('${esc(bag.id)}')" aria-label="Delete bag"><i class="ti ti-trash"></i></button>
         </div>
       </div>
 
@@ -512,13 +523,13 @@ function renderCollection(){
           <div class="text-11 c-dark f500" style="text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Current market value</div>
           <div id="col-val-display" style="font-size:18px;font-weight:500;color:#4B1528">
             ${fmt(bag.currentValue)}
-            <i class="ti ti-pencil" style="font-size:11px;color:#993556;cursor:pointer;margin-left:4px" onclick="colStartEdit(${bag.currentValue},'${esc(bag.id)}')" title="Update value"></i>
+            <i class="ti ti-pencil" role="button" tabindex="0" aria-label="Update value" style="font-size:11px;color:#993556;cursor:pointer;margin-left:4px" onclick="colStartEdit()" title="Update value"></i>
           </div>
           <div id="col-val-edit" style="display:none;margin-top:6px">
             <div class="flex gap-6">
-              <input id="col-new-val" type="number" value="${bag.currentValue}" class="inp" style="width:110px">
+              <input id="col-new-val" type="number" min="0" value="${bag.currentValue}" class="inp" style="width:110px" aria-label="New market value" onkeydown="if(event.key==='Enter')colSaveVal('${esc(bag.id)}')">
               <button class="btn btn-primary btn-sm" onclick="colSaveVal('${esc(bag.id)}')">Save</button>
-              <button class="btn btn-ghost btn-sm" onclick="colCancelEdit()">✕</button>
+              <button class="btn btn-ghost btn-sm" onclick="colCancelEdit()" aria-label="Cancel">✕</button>
             </div>
           </div>
           <div style="margin-top:4px">${deltaBadge(p)}</div>
@@ -527,7 +538,7 @@ function renderCollection(){
         <div class="card">
           <div class="text-11 c-dark f500" style="text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Gain / Loss</div>
           <div style="font-size:18px;font-weight:500;color:#4B1528">${fmt(gain)}</div>
-          <div style="margin-top:4px;font-size:11px;color:${p>=0?GREEN:RED}">${p>=0?'+':''}${p.toFixed(1)}% vs. cost</div>
+          <div style="margin-top:4px;font-size:11px;color:${pctColor(p)}">${fmtPct(p)} vs. cost</div>
         </div>
       </div>
 
@@ -563,9 +574,7 @@ function renderCollection(){
     <div><div class="tb-title">My collection</div>
     <div class="tb-sub">${bags.length} bag${bags.length!==1?'s':''} tracked</div></div>
     <div class="flex gap-8">
-      <button class="btn btn-ghost" onclick="aiRefreshValues()" ${S.aiRefreshing||!bags.length?'disabled':''}>
-        <i class="ti ti-${S.aiRefreshing?'loader-2 spin':'sparkles'}"></i> ${S.aiRefreshing?'Updating…':'Refresh values with AI'}
-      </button>
+      ${refreshBtn()}
       <button class="btn btn-primary" onclick="go('add-bag')"><i class="ti ti-plus"></i> Add bag</button>
     </div>
   </div>
@@ -574,7 +583,7 @@ function renderCollection(){
       <div style="padding:14px 14px 10px;border-bottom:.5px solid #F4C0D1">
         <div class="search-box">
           <i class="ti ti-search" style="font-size:15px;color:#993556"></i>
-          <input value="${esc(S.colSearch)}" oninput="colSearch(this.value)" placeholder="Search bags…">
+          <input type="search" aria-label="Search bags" value="${esc(S.colSearch)}" oninput="colSearch(this.value)" placeholder="Search bags…">
         </div>
         <div class="flex gap-6" style="flex-wrap:wrap">
           ${brands.map(br=>`<button class="chip ${S.colBrandFilter===br?'active':''}" onclick="colFilter('${esc(br)}')">${esc(br)}</button>`).join('')}
@@ -583,7 +592,7 @@ function renderCollection(){
       <div class="col-list-scroll">
         ${fil.length===0?`<div style="padding:20px;text-align:center;font-size:12px;color:#993556">No bags match.</div>`:
           fil.map(b=>{const p=calcPct(b.currentValue,b.purchasePrice);return`
-            <div class="bag-item ${b.id===S.colSelected?'active':''}" onclick="colSelect('${esc(b.id)}')">
+            <div class="bag-item ${b.id===S.colSelected?'active':''}" role="button" tabindex="0" aria-current="${b.id===S.colSelected}" onclick="colSelect('${esc(b.id)}')">
               <div class="bag-thumb"><i class="ti ti-briefcase" style="font-size:20px;color:#993556"></i></div>
               <div class="flex-1 min-w-0">
                 <div class="text-12 f500 c-deepest nowrap">${esc(b.name)}</div>
@@ -591,7 +600,7 @@ function renderCollection(){
               </div>
               <div style="text-align:right;flex-shrink:0">
                 <div class="text-12 f500 c-deepest">${fmt(b.currentValue)}</div>
-                <div style="font-size:10px;color:${p>=0?GREEN:RED}">${p>=0?'+':''}${p.toFixed(1)}%</div>
+                <div style="font-size:10px;color:${pctColor(p)}">${fmtPct(p)}</div>
               </div>
             </div>`;}).join('')}
       </div>
@@ -603,11 +612,21 @@ function renderCollection(){
 function colSelect(id){S.colSelected=id;render();}
 function colSearch(v){S.colSearch=v;render();}
 function colFilter(v){S.colBrandFilter=v;render();}
-function colDeleteBag(id){if(!confirm('Remove this bag from your collection?'))return;S.bags=S.bags.filter(b=>b.id!==id);if(S.colSelected===id)S.colSelected=S.bags[0]?.id||null;saveBags();toast('Bag removed');render();}
-function colEditBag(id){S.editBag=S.bags.find(b=>b.id===id);const b=S.editBag;S.addForm={...b,purchasePrice:String(b.purchasePrice),currentValue:String(b.currentValue)};go('add-bag');}
-function colStartEdit(cur,id){$('col-val-display').style.display='none';$('col-val-edit').style.display='block';$('col-new-val').value=cur;}
+function colDeleteBag(id){
+  if(!confirm('Remove this bag from your collection?'))return;
+  S.bags=S.bags.filter(b=>b.id!==id);
+  S.alerts=S.alerts.filter(a=>a.bagId!==id); // its alerts can never fire again
+  if(S.colSelected===id)S.colSelected=S.bags[0]?.id||null;
+  saveBags();saveAlerts();toast('Bag removed');render();
+}
+function colEditBag(id){const b=S.bags.find(b=>b.id===id);S.editBag=b;S.addForm={...b,purchasePrice:String(b.purchasePrice),currentValue:String(b.currentValue)};S.page='add-bag';render();}
+function colStartEdit(){$('col-val-display').style.display='none';$('col-val-edit').style.display='block';$('col-new-val').focus();}
 function colCancelEdit(){$('col-val-edit').style.display='none';$('col-val-display').style.display='block';}
-function colSaveVal(id){const v=Number($('col-new-val').value);S.bags=S.bags.map(b=>b.id===id?{...b,currentValue:v}:b);saveBags();toast('Value updated');render();}
+function colSaveVal(id){
+  const raw=$('col-new-val').value,v=Number(raw);
+  if(raw===''||!(v>=0)){toast('Enter a value of 0 or more');return;} // Number('') is 0 and Number('-') is NaN
+  S.bags=S.bags.map(b=>b.id===id?{...b,currentValue:v}:b);saveBags();toast('Value updated');render();
+}
 
 // ── ADD BAG ────────────────────────────────────────────────────────────────────
 function selOpts(arr,val,ph){
@@ -617,7 +636,7 @@ function selOpts(arr,val,ph){
 function renderAddBag(){
   const f=S.addForm||{};
   const isEdit=!!S.editBag;
-  const previewPct=f.purchasePrice&&f.currentValue?((Number(f.currentValue)-Number(f.purchasePrice))/Number(f.purchasePrice)*100):null;
+  const previewPct=f.purchasePrice&&f.currentValue?calcPct(Number(f.currentValue),Number(f.purchasePrice)):null;
 
   return `
   <div class="topbar">
@@ -648,7 +667,7 @@ function renderAddBag(){
       </div>
       <div class="field-grid">
         <div class="field"><label>Hardware</label><div class="sel-wrap"><select class="inp" onchange="addSet('hardware',this.value)">${selOpts(HARDWARE,f.hardware||'','Select hardware')}</select></div></div>
-        <div class="field"><label>Production year</label><input class="inp" value="${esc(f.year||'')}" oninput="addSet('year',this.value)" placeholder="e.g. 2022"></div>
+        <div class="field"><label>Production year</label><input class="inp" inputmode="numeric" value="${esc(f.year||'')}" oninput="addSet('year',this.value)" placeholder="e.g. 2022"></div>
       </div>
       <div class="divider"></div>
       <div class="section-lbl">Purchase details</div>
@@ -663,12 +682,12 @@ function renderAddBag(){
       <div class="divider"></div>
       <div class="section-lbl">Condition</div>
       <div class="flex gap-8 mb-16">
-        ${CONDITIONS.map(c=>`<button class="cond-btn ${(f.condition||'Excellent')===c?'active':''}" onclick="addSetCond('${esc(c)}')">${esc(c)}</button>`).join('')}
+        ${CONDITIONS.map(c=>`<button class="cond-btn ${(f.condition||'Excellent')===c?'active':''}" aria-pressed="${(f.condition||'Excellent')===c}" onclick="addSetCond('${esc(c)}')">${esc(c)}</button>`).join('')}
       </div>
       <div class="divider"></div>
       <div class="section-lbl">Tags</div>
       <div class="flex gap-6 mb-16" style="flex-wrap:wrap">
-        ${ALL_TAGS.map(t=>`<button class="tag-pill ${(f.tags||[]).includes(t)?'on':''}" onclick="addToggleTag('${esc(t)}')">${esc(t)}</button>`).join('')}
+        ${ALL_TAGS.map(t=>`<button class="tag-pill ${(f.tags||[]).includes(t)?'on':''}" aria-pressed="${(f.tags||[]).includes(t)}" onclick="addToggleTag('${esc(t)}')">${esc(t)}</button>`).join('')}
       </div>
       <div class="divider"></div>
       <div class="field"><label>Notes</label>
@@ -697,7 +716,7 @@ function renderAddBag(){
       </div>
       <div class="text-11 c-dark" style="line-height:1.6">
         <i class="ti ti-info-circle" style="font-size:13px;vertical-align:-2px;margin-right:4px"></i>
-        Market value estimates update weekly from authenticated resale platforms.
+        Update market values any time with "Refresh values with AI" or the pencil next to a bag's value.
       </div>
     </div>
   </div>
@@ -716,9 +735,10 @@ function addToggleTag(t){const tags=S.addForm.tags||[];S.addForm={...S.addForm,t
 function addCancel(){S.editBag=null;S.addForm=null;go('collection');}
 function addSave(){
   const f=S.addForm;
-  if(!f.brand||!f.model||!f.purchasePrice){alert('Please fill in brand, model, and purchase price.');return;}
+  if(!f.brand||!f.model?.trim()||f.purchasePrice===''){alert('Please fill in brand, model, and purchase price.');return;}
   const price=Number(String(f.purchasePrice).replace(/[^0-9.]/g,''));
-  const curVal=f.currentValue?Number(String(f.currentValue).replace(/[^0-9.]/g,'')):price;
+  const curVal=f.currentValue!==''?Number(String(f.currentValue).replace(/[^0-9.]/g,'')):price;
+  if(isNaN(price)||isNaN(curVal)){alert('Prices must be numbers.');return;}
   const isEdit=!!S.editBag;
   const bag={...f,purchasePrice:price,currentValue:curVal,id:S.editBag?.id||'b'+Date.now(),name:f.name||(f.brand+' '+f.model)};
   if(isEdit){S.bags=S.bags.map(b=>b.id===bag.id?bag:b);}
@@ -730,7 +750,7 @@ function addSave(){
 }
 
 // ── MARKET TRENDS ─────────────────────────────────────────────────────────────
-const QUICK_Q=['Hermès Birkin resale value 2025','Chanel Classic Flap price trend','Louis Vuitton resale market 2025','luxury bag investment returns 2025'];
+const QUICK_Q=['Hermès Birkin resale value','Chanel Classic Flap price trend','Louis Vuitton resale market','Luxury bag investment returns'];
 
 function renderTrends(){
   const r=S.trendsResults;
@@ -743,7 +763,7 @@ function renderTrends(){
     <div class="card mb-16">
       <div class="section-lbl">Search market data</div>
       <div class="flex gap-10 mb-12">
-        <input id="trends-q" class="inp" value="${esc(S.trendsQuery)}" oninput="S.trendsQuery=this.value" onkeydown="if(event.key==='Enter')trendsSearch()" style="flex:1" placeholder="e.g. Hermès Birkin resale 2025, Chanel price trend…">
+        <input id="trends-q" class="inp" value="${esc(S.trendsQuery)}" oninput="S.trendsQuery=this.value" onkeydown="if(event.key==='Enter')trendsSearch()" style="flex:1" aria-label="Market search" placeholder="e.g. Hermès Birkin resale, Chanel price trend…">
         <button class="btn btn-primary" onclick="trendsSearch()" ${S.trendsLoading?'disabled':''}>
           <i class="ti ti-${S.trendsLoading?'loader-2 spin':'search'}"></i> ${S.trendsLoading?'Searching…':'Search'}
         </button>
@@ -758,7 +778,7 @@ function renderTrends(){
       <div class="grid-3 mb-14">
         ${[
           {l:'Price range',v:r.priceRange,ic:'currency-dollar',col:''},
-          {l:'Price trend',v:r.trend,ic:'trending-up',col:r.trend&&r.trend.startsWith('+')?GREEN:RED},
+          {l:'Price trend',v:r.trend,ic:'trending-up',col:String(r.trend??'').startsWith('-')?RED:GREEN},
           {l:'Market outlook',v:r.outlook,ic:'chart-bar',col:r.outlook==='bullish'?GREEN:r.outlook==='bearish'?RED:ROSE_DARK}
         ].map(s=>`<div class="stat-card">
           <div class="stat-lbl">${s.l}</div>
@@ -771,12 +791,12 @@ function renderTrends(){
         <div class="section-lbl">Market summary</div>
         <p style="font-size:13px;color:#4B1528;line-height:1.7;margin-bottom:14px">${esc(r.summary||'')}</p>
         <div class="section-lbl">Key factors</div>
-        ${(r.keyFactors||[]).map(f=>`<div class="flex gap-10 items-start mb-8">
+        ${arr(r.keyFactors).map(f=>`<div class="flex gap-10 items-start mb-8">
           <div style="width:6px;height:6px;border-radius:50%;background:#D4537E;flex-shrink:0;margin-top:5px"></div>
           <span class="text-13 c-deepest">${esc(f)}</span></div>`).join('')}
       </div>
-      ${(r.sources||[]).length?`<div class="card"><div class="section-lbl">Sources</div>
-        ${r.sources.map(s=>`<div class="text-12 c-dark mb-6"><i class="ti ti-link" style="font-size:12px;margin-right:6px"></i>${esc(s)}</div>`).join('')}
+      ${arr(r.sources).length?`<div class="card"><div class="section-lbl">Sources</div>
+        ${arr(r.sources).map(s=>`<div class="text-12 c-dark mb-6"><i class="ti ti-link" style="font-size:12px;margin-right:6px"></i>${esc(s)}</div>`).join('')}
       </div>`:''}
     `:''}
     ${!S.trendsLoading&&!r&&!S.trendsError?emptyState('chart-line','Search for market data','Enter a bag model or brand above to get live resale price trends, market outlook, and key value drivers.'):''}
@@ -784,7 +804,7 @@ function renderTrends(){
 }
 
 async function trendsSearch(){
-  const q=S.trendsQuery.trim();if(!q)return;
+  const q=S.trendsQuery.trim();if(!q||S.trendsLoading)return; // Enter in the box bypasses the disabled button
   S.trendsLoading=true;S.trendsError=null;S.trendsResults=null;render();
   try{
     S.trendsResults=await askClaude(`Search for current luxury handbag resale market data about: "${q}". Provide a concise market summary. Give prices in ${cur()}. Respond ONLY with a valid JSON object (no markdown, no backticks) with keys: summary (2-3 sentences), priceRange (string), trend (string like "+12% YoY"), outlook ("bullish"|"bearish"|"stable"), keyFactors (array of strings max 4), sources (array of strings).`);
@@ -796,12 +816,8 @@ function trendsQuick(q){S.trendsQuery=q;trendsSearch();}
 // ── REPORTS ────────────────────────────────────────────────────────────────────
 function renderReports(){
   const bags=S.bags;
-  const tv=bags.reduce((a,b)=>a+(b.currentValue||0),0);
-  const tc=bags.reduce((a,b)=>a+(b.purchasePrice||0),0);
-  const gain=tv-tc;
-  const gainPct=tc>0?(gain/tc)*100:0;
-  const topBag=[...bags].sort((a,b)=>calcPct(b.currentValue,b.purchasePrice)-calcPct(a.currentValue,a.purchasePrice))[0];
-  const byBrand=bags.reduce((a,b)=>{a[b.brand]=(a[b.brand]||0)+(b.currentValue||0);return a;},{});
+  const {v:tv,c:tc,pct:gainPct}=totals(),gain=tv-tc;
+  const topBag=byGain()[0];
   const r=S.reportsReport;
 
   return `
@@ -816,8 +832,8 @@ function renderReports(){
       ${[
         {l:'Portfolio value',v:fmt(tv),col:''},
         {l:'Total cost basis',v:fmt(tc),col:''},
-        {l:'Total gain / loss',v:fmt(gain),col:gain>=0?GREEN:RED},
-        {l:'Overall appreciation',v:fmtPct(gainPct),col:gainPct>=0?GREEN:RED}
+        {l:'Total gain / loss',v:fmt(gain),col:pctColor(gain)},
+        {l:'Overall appreciation',v:fmtPct(gainPct),col:pctColor(gainPct)}
       ].map(s=>`<div class="stat-card"><div class="stat-lbl">${s.l}</div><div class="stat-val" style="${s.col?'color:'+s.col:''}">${s.v}</div></div>`).join('')}
     </div>
     <div class="grid-2 mb-14">
@@ -831,13 +847,13 @@ function renderReports(){
             </div>
             <div style="text-align:right;flex-shrink:0">
               <div class="text-12 f500 c-deepest">${fmt(b.currentValue)}</div>
-              <div style="font-size:11px;color:${p>=0?GREEN:RED}">${p>=0?'+':''}${p.toFixed(1)}%</div>
+              <div style="font-size:11px;color:${pctColor(p)}">${fmtPct(p)}</div>
             </div>
           </div>`;}).join('')}
       </div>
       <div class="card">
         <div class="section-lbl">By brand</div>
-        ${Object.entries(byBrand).sort((a,b)=>b[1]-a[1]).map(([br,val])=>{const p=tv>0?(val/tv)*100:0;return`
+        ${brandTotals().map(([br,val])=>{const p=tv>0?(val/tv)*100:0;return`
           <div class="flex items-center gap-8 text-12 mb-10">
             <span style="width:90px;color:#993556;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(br)}</span>
             <div style="flex:1;height:6px;background:#FBEAF0;border-radius:3px"><div style="width:${p.toFixed(0)}%;height:100%;background:#D4537E;border-radius:3px"></div></div>
@@ -859,15 +875,15 @@ function renderReports(){
       <div class="grid-2 mb-14">
         <div>
           <div style="font-size:11px;font-weight:500;color:#3B6D11;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Strengths</div>
-          ${(r.strengths||[]).map(s=>`<div class="flex gap-8 mb-6"><i class="ti ti-circle-check" style="font-size:14px;color:#3B6D11;flex-shrink:0;margin-top:1px"></i><span class="text-12 c-deepest">${esc(s)}</span></div>`).join('')}
+          ${arr(r.strengths).map(s=>`<div class="flex gap-8 mb-6"><i class="ti ti-circle-check" style="font-size:14px;color:#3B6D11;flex-shrink:0;margin-top:1px"></i><span class="text-12 c-deepest">${esc(s)}</span></div>`).join('')}
         </div>
         <div>
           <div style="font-size:11px;font-weight:500;color:#A32D2D;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Risks</div>
-          ${(r.risks||[]).map(s=>`<div class="flex gap-8 mb-6"><i class="ti ti-alert-triangle" style="font-size:14px;color:#A32D2D;flex-shrink:0;margin-top:1px"></i><span class="text-12 c-deepest">${esc(s)}</span></div>`).join('')}
+          ${arr(r.risks).map(s=>`<div class="flex gap-8 mb-6"><i class="ti ti-alert-triangle" style="font-size:14px;color:#A32D2D;flex-shrink:0;margin-top:1px"></i><span class="text-12 c-deepest">${esc(s)}</span></div>`).join('')}
         </div>
       </div>
       <div class="section-lbl">Recommendations</div>
-      ${(r.recommendations||[]).map(s=>`<div class="flex gap-8 mb-6"><i class="ti ti-arrow-right" style="font-size:14px;color:#D4537E;flex-shrink:0;margin-top:1px"></i><span class="text-12 c-deepest">${esc(s)}</span></div>`).join('')}
+      ${arr(r.recommendations).map(s=>`<div class="flex gap-8 mb-6"><i class="ti ti-arrow-right" style="font-size:14px;color:#D4537E;flex-shrink:0;margin-top:1px"></i><span class="text-12 c-deepest">${esc(s)}</span></div>`).join('')}
       ${r.marketNote?`<div style="margin-top:12px;padding:10px 12px;background:#FBEAF0;border-radius:8px;font-size:12px;color:#72243E"><i class="ti ti-globe" style="font-size:13px;margin-right:6px"></i>${esc(r.marketNote)}</div>`:''}
     </div>`:''}
     ${!S.reportsLoading&&!r&&bags.length?`<div class="card" style="text-align:center;padding:32px">
@@ -878,12 +894,11 @@ function renderReports(){
 }
 
 async function reportsGenerate(){
-  if(!S.bags.length)return;
+  if(!S.bags.length||S.reportsLoading)return;
   S.reportsLoading=true;render();
   try{
     const summary=S.bags.map(b=>({name:b.name,brand:b.brand,purchasePrice:b.purchasePrice,currentValue:b.currentValue,year:b.year,condition:b.condition}));
-    const tv=S.bags.reduce((a,b)=>a+(b.currentValue||0),0);
-    const tc=S.bags.reduce((a,b)=>a+(b.purchasePrice||0),0);
+    const {v:tv,c:tc}=totals();
     S.reportsReport=await askClaude(`Generate a luxury bag portfolio analysis. All prices are in ${cur()}. Collection: ${JSON.stringify(summary)}. Total value: ${fmt(tv)}. Cost: ${fmt(tc)}. Search for current market conditions. Respond ONLY with a valid JSON object (no markdown, no backticks): { "executiveSummary":"...", "strengths":["...","...","..."], "risks":["...","..."], "recommendations":["...","...","..."], "marketNote":"..." }`);
   }catch(e){S.reportsReport={executiveSummary:'Report generation failed: '+e.message,strengths:[],risks:[],recommendations:[],marketNote:''};}
   S.reportsLoading=false;render();
@@ -893,9 +908,8 @@ async function reportsGenerate(){
 function renderAlerts(){
   const bags=S.bags;
   const enriched=S.alerts.map(a=>{
-    const bag=bags.find(b=>b.id===a.bagId);if(!bag)return null;
-    const triggered=a.type==='above'?bag.currentValue>=a.targetPrice:bag.currentValue<=a.targetPrice;
-    return{...a,bag,triggered};
+    const bag=bags.find(b=>b.id===a.bagId);
+    return bag&&{...a,bag,triggered:alertFiring(a)};
   }).filter(Boolean);
   const f=S.alertForm;
 
@@ -910,7 +924,7 @@ function renderAlerts(){
         <option value="above" ${f.type==='above'?'selected':''}>Above target</option>
         <option value="below" ${f.type==='below'?'selected':''}>Below target</option>
       </select></div></div>
-      <div class="field"><label>Target price (${cur()})</label><input class="inp" type="number" value="${esc(f.targetPrice)}" oninput="alertSet('targetPrice',this.value)" placeholder="e.g. 30000"></div>
+      <div class="field"><label>Target price (${cur()})</label><input class="inp" type="number" min="0" value="${esc(f.targetPrice)}" oninput="alertSet('targetPrice',this.value)" placeholder="e.g. 30000"></div>
     </div>
     ${f.bagId?`<div class="text-12 c-dark mb-14">Current value: ${fmt(bags.find(b=>b.id===f.bagId)?.currentValue||0)}</div>`:''}
     <div class="flex gap-8">
@@ -933,7 +947,7 @@ function renderAlerts(){
         ${a.triggered?`<span class="badge badge-green-mid"><i class="ti ti-circle-check" style="font-size:10px;margin-right:4px"></i>Triggered</span>`:''}
         <div class="flex gap-6 flex-shrink-0">
           ${a.triggered?`<button class="btn btn-ghost btn-sm" onclick="alertDismiss('${esc(a.id)}')">Dismiss</button>`:''}
-          <button class="btn btn-danger btn-sm" onclick="alertDelete('${esc(a.id)}')"><i class="ti ti-trash"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="alertDelete('${esc(a.id)}')" aria-label="Delete alert"><i class="ti ti-trash"></i></button>
         </div>
       </div>`).join('');
 
@@ -948,15 +962,13 @@ function renderAlerts(){
 
 function alertSet(k,v){S.alertForm={...S.alertForm,[k]:v};render();}
 function alertAdd(){
-  const f=S.alertForm;if(!f.bagId||!f.targetPrice)return;
-  const bag=S.bags.find(b=>b.id===f.bagId);
-  const target=Number(f.targetPrice);
-  const triggered=f.type==='above'?bag.currentValue>=target:bag.currentValue<=target;
-  S.alerts=[...S.alerts,{...f,id:'a'+Date.now(),targetPrice:target,triggered,createdAt:todayStr()}];
+  const f=S.alertForm,target=Number(f.targetPrice);
+  if(!f.bagId||f.targetPrice===''||!(target>=0)){toast('Pick a bag and a target price');return;}
+  S.alerts=[...S.alerts,{...f,id:'a'+Date.now(),targetPrice:target,createdAt:todayStr()}];
   saveAlerts();S.alertAdding=false;S.alertForm={bagId:'',type:'above',targetPrice:''};
   toast('Price alert created');render();
 }
-function alertDismiss(id){S.alerts=S.alerts.map(a=>a.id===id?{...a,triggered:false}:a);saveAlerts();render();}
+function alertDismiss(id){S.alerts=S.alerts.map(a=>a.id===id?{...a,dismissedValue:S.bags.find(b=>b.id===a.bagId)?.currentValue}:a);saveAlerts();render();}
 function alertDelete(id){S.alerts=S.alerts.filter(a=>a.id!==id);saveAlerts();toast('Alert removed');render();}
 
 // ── WISHLIST ──────────────────────────────────────────────────────────────────
@@ -972,7 +984,11 @@ function renderWishlist(){
     </div>
     <div class="field-grid">
       <div class="field"><label>Color</label><input class="inp" value="${esc(f.color)}" oninput="wishSet('color',this.value)" placeholder="e.g. Rouge Casaque"></div>
-      <div class="field"><label>Max budget (${cur()})</label><input class="inp" type="number" value="${esc(f.maxBudget)}" oninput="wishSet('maxBudget',this.value)" placeholder="0"></div>
+      <div class="field"><label>Max budget (${cur()})</label><input class="inp" type="number" min="0" value="${esc(f.maxBudget)}" oninput="wishSet('maxBudget',this.value)" placeholder="0"></div>
+    </div>
+    <div class="field-grid">
+      <div class="field"><label>Material</label><div class="sel-wrap"><select class="inp" onchange="wishSet('material',this.value)">${selOpts(MATERIALS,f.material,'Any material')}</select></div></div>
+      <div class="field"><label>Hardware</label><div class="sel-wrap"><select class="inp" onchange="wishSet('hardware',this.value)">${selOpts(HARDWARE,f.hardware,'Any hardware')}</select></div></div>
     </div>
     <div class="field"><label>Notes</label><textarea class="inp" rows="2" oninput="wishSet('notes',this.value)" placeholder="Preferred condition, year, any other details…">${esc(f.notes)}</textarea></div>
     <div class="flex gap-8" style="margin-top:14px">
@@ -988,7 +1004,7 @@ function renderWishlist(){
         <div class="flex justify-between items-start mb-12">
           <div style="width:44px;height:44px;border-radius:8px;background:#FBEAF0;display:flex;align-items:center;justify-content:center">
             <i class="ti ti-heart" style="font-size:20px;color:#D4537E"></i></div>
-          <button class="btn btn-danger btn-sm" onclick="wishDelete('${esc(w.id)}')"><i class="ti ti-x"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="wishDelete('${esc(w.id)}')" aria-label="Remove from wishlist"><i class="ti ti-x"></i></button>
         </div>
         <div style="font-size:10px;font-weight:500;color:#993556;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${esc(w.brand)}</div>
         <div style="font-size:14px;font-weight:500;color:#4B1528;margin-bottom:8px">${esc(w.model)}</div>
@@ -1015,7 +1031,7 @@ function renderWishlist(){
 
 function wishSet(k,v){S.wishForm={...S.wishForm,[k]:v};render();}
 function wishAdd(){
-  const f=S.wishForm;if(!f.brand||!f.model)return;
+  const f=S.wishForm;if(!f.brand||!f.model.trim()){toast('Pick a brand and enter a model');return;}
   S.wishlist=[...S.wishlist,{...f,id:'w'+Date.now(),maxBudget:Number(f.maxBudget)||0,addedAt:todayStr()}];
   saveWish();S.wishAdding=false;S.wishForm={brand:'',model:'',color:'',material:'',hardware:'',maxBudget:'',notes:''};
   toast('Added to wishlist');render();
@@ -1025,8 +1041,8 @@ function wishDelete(id){S.wishlist=S.wishlist.filter(w=>w.id!==id);saveWish();to
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
 function renderSettings(){
   const s=S.settings;
-  const tog=key=>`<div onclick="settingsTog('${key}')" class="toggle" style="background:${s[key]?ROSE:BLUSH_MID}">
-    <div class="toggle-knob" style="left:${s[key]?20:2}px"></div></div>`;
+  const tog=(key,label)=>`<button type="button" role="switch" aria-checked="${!!s[key]}" aria-label="${label}" onclick="settingsTog('${key}')" class="toggle" style="background:${s[key]?ROSE:BLUSH_MID}">
+    <span class="toggle-knob" style="left:${s[key]?20:2}px"></span></button>`;
 
   return `
   <div class="topbar">
@@ -1039,7 +1055,7 @@ function renderSettings(){
         <div class="section-lbl">Profile</div>
         <div class="field-grid">
           <div class="field"><label>Display name</label><input id="s-name" class="inp" value="${esc(s.name||'')}" placeholder="Your name"></div>
-          <div class="field"><label>Email</label><input id="s-email" class="inp" value="${esc(s.email||'')}" placeholder="you@example.com"></div>
+          <div class="field"><label>Email</label><input id="s-email" type="email" class="inp" value="${esc(s.email||'')}" placeholder="you@example.com"></div>
         </div>
         <div class="field" style="max-width:260px"><label>App name (shown in sidebar)</label>
           <input id="s-appname" class="inp" value="${esc(s.appName||'')}" placeholder="Mary Katherine"></div>
@@ -1064,7 +1080,7 @@ function renderSettings(){
         ].map(({k,l,s:sub})=>`
           <div class="flex justify-between items-center mb-14">
             <div><div class="text-13 f500 c-deepest">${l}</div><div class="text-11 c-dark">${sub}</div></div>
-            ${tog(k)}
+            ${tog(k,l)}
           </div>`).join('')}
       </div>
       <div class="card" style="border-color:#F7C1C1">
@@ -1076,30 +1092,28 @@ function renderSettings(){
   </div>`;
 }
 
-function settingsTog(k){S.settings={...S.settings,[k]:!S.settings[k]};render();}
-function settingsSave(){
-  S.settings={
-    ...S.settings,
-    name:$('s-name')?.value||S.settings.name,
-    email:$('s-email')?.value||S.settings.email,
-    appName:$('s-appname')?.value||S.settings.appName,
-    currency:$('s-currency')?.value||S.settings.currency,
-    plan:$('s-plan')?.value||S.settings.plan
-  };
-  saveSettings();toast('Settings saved');render();
+// Reads the form into settings. Toggles call this too, so their re-render doesn't wipe unsaved typing.
+function settingsRead(){
+  const v=id=>$(id)?.value;
+  return{...S.settings,name:v('s-name')||S.settings.name,email:v('s-email')??S.settings.email,
+    appName:v('s-appname')||S.settings.appName,currency:v('s-currency')||S.settings.currency,plan:v('s-plan')||S.settings.plan};
 }
+function settingsTog(k){S.settings=settingsRead();S.settings[k]=!S.settings[k];render();}
+function settingsSave(){S.settings=settingsRead();saveSettings();toast('Settings saved');render();}
 function settingsClear(){
   if(!confirm('Clear all collection data? This cannot be undone.'))return;
-  S.bags=[];saveBags();toast('Collection cleared');render();
+  S.bags=[];S.alerts=[];saveBags();saveAlerts();toast('Collection cleared');render();
 }
 
 // ── AI VALUE REFRESH ──────────────────────────────────────────────────────────
 async function aiRefreshValues(){
   if(!S.bags.length||S.aiRefreshing)return;
   S.aiRefreshing=true;S.aiRefreshLog=[];render();
+  // The search takes a while and the user can keep editing; match results to this snapshot by id, not by current position.
+  const snapshot=S.bags,startPage=S.page;
 
   // Build a single prompt listing all bags so we make one API call
-  const bagList=S.bags.map((b,i)=>`${i+1}. ${b.brand} ${b.model}${b.color?' in '+b.color:''}${b.size?', '+b.size:''}${b.year?', '+b.year:''} (condition: ${b.condition})`).join('\n');
+  const bagList=snapshot.map((b,i)=>`${i+1}. ${b.brand} ${b.model}${b.color?' in '+b.color:''}${b.size?', '+b.size:''}${b.year?', '+b.year:''} (condition: ${b.condition})`).join('\n');
 
   try{
     const results=await askClaude(`Search the web for current ${new Date().getFullYear()} resale market values, in ${cur()}, for each of these luxury handbags. For each bag, search authenticated resale platforms (Vestiaire Collective, The RealReal, Fashionphile, 1stDibs) to find realistic current resale price ranges.
@@ -1115,16 +1129,18 @@ Respond ONLY with a valid JSON array (no markdown, no backticks, no explanation)
 
 Use realistic resale market prices (not retail). If you cannot find data for a bag, use null for estimatedValue and explain briefly in source.`);
 
-    // Apply updates and build log
+    if(!Array.isArray(results))throw new Error('Claude returned an unexpected format. Please try again.');
+    // Apply updates and build log (alerts re-evaluate themselves from the new values)
     const log=[];
     results.forEach(r=>{
-      const bag=S.bags[r.index-1];
-      if(!bag)return;
-      if(r.estimatedValue&&r.estimatedValue>0){
-        const oldVal=bag.currentValue;
-        const newVal=Math.round(r.estimatedValue);
+      const bag=snapshot[r.index-1];
+      if(!bag||!S.bags.some(b=>b.id===bag.id))return; // deleted while we waited
+      const est=Number(r.estimatedValue);
+      if(est>0){
+        const oldVal=S.bags.find(b=>b.id===bag.id).currentValue;
+        const newVal=Math.round(est);
         S.bags=S.bags.map(b=>b.id===bag.id?{...b,currentValue:newVal,lastAiUpdate:todayStr()}:b);
-        log.push({name:bag.name,ok:true,oldVal,newVal,source:r.priceRange?(r.priceRange+' · '+r.source):r.source});
+        log.push({name:bag.name,ok:true,oldVal,newVal,source:[r.priceRange,r.source].filter(Boolean).join(' · ')});
       } else {
         log.push({name:bag.name,ok:false,error:r.source||'No data found'});
       }
@@ -1132,16 +1148,7 @@ Use realistic resale market prices (not retail). If you cannot find data for a b
 
     saveBags();
     S.aiRefreshLog=log;
-
-    // Re-evaluate alerts against new values
-    S.alerts=S.alerts.map(a=>{
-      const bag=S.bags.find(b=>b.id===a.bagId);
-      if(!bag)return a;
-      return{...a,triggered:a.type==='above'?bag.currentValue>=a.targetPrice:bag.currentValue<=a.targetPrice};
-    });
-    saveAlerts();
-
-    toast(`AI updated ${log.filter(l=>l.ok).length} of ${S.bags.length} bag values`);
+    toast(`AI updated ${log.filter(l=>l.ok).length} of ${snapshot.length} bag values`);
 
   }catch(e){
     console.error(e);
@@ -1149,8 +1156,8 @@ Use realistic resale market prices (not retail). If you cannot find data for a b
   }
 
   S.aiRefreshing=false;
-  // Navigate to dashboard to show the log
-  S.page='dashboard';
+  // Show the log on the dashboard, unless the user has moved on to another page meanwhile
+  if(S.page===startPage)S.page='dashboard';
   render();
 }
 
@@ -1174,9 +1181,18 @@ function render(){
   $('main').innerHTML=(PAGES[S.page]||renderDashboard)();
   const el=key&&[...$('main').querySelectorAll('[oninput]')].find(e=>e.getAttribute('oninput')===key);
   if(el){el.focus();try{if(pos!==null)el.setSelectionRange(pos,pos);}catch{}}
+  // Link each form label to its control so tapping the label focuses it and screen readers read it
+  $('main').querySelectorAll('.field').forEach((f,i)=>{
+    const l=f.querySelector('label'),c=f.querySelector('input,select,textarea');
+    if(l&&c){c.id||=('fld'+i);l.htmlFor=c.id;}
+  });
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
+// Enter/Space activate non-button elements marked role="button" (bag list rows, links in text)
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role="button"]')){e.preventDefault();e.target.click();}
+});
 document.querySelectorAll('.nav-item').forEach(el=>{
   el.addEventListener('click',()=>go(el.dataset.page));
 });

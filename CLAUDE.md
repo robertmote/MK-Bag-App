@@ -9,6 +9,9 @@
 - State lives in one global `S`; every change calls `render()`, which rebuilds `#main` via `innerHTML` from the `PAGES` map. `render()` restores focus and caret to the field being typed in, matched by its `oninput` attribute, so every input needs a unique `oninput`.
 - Pages: dashboard, collection, add-bag (add and edit), trends, reports, alerts, wishlist, settings.
 - Data is saved in `localStorage` under keys prefixed `Mary Katherine_` (bags, alerts, wishlist, settings). If nothing is saved yet, the app starts from the `SEED_*` sample data.
+- Whether an alert is firing is computed live by `alertFiring()` from the bag's current value; nothing stores a "triggered" flag. Dismiss records the value at that moment (`dismissedValue`), so the alert fires again when the value changes.
+- Shared calculations live in helpers (`totals()`, `byGain()`, `brandTotals()`, `fmtPct()`, `pctColor()`); use them instead of re-deriving.
+- Accessibility: clickable non-buttons get `role="button" tabindex="0"` (a global keydown handler makes Enter/Space work), icon-only buttons get `aria-label`, and `render()` links each `.field` label to its control.
 - Money goes through `fmt()`, which uses the currency from Settings. It changes the symbol only; there is no exchange-rate conversion.
 - Icons come from the Tabler icons webfont (CDN). The palette is rose/blush, with hex values hard-coded in the CSS and in the JS constants.
 
