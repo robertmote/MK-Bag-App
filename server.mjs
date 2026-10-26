@@ -1,6 +1,7 @@
 // Serves index.html and forwards its AI prompts to Claude, so the API key never reaches the browser.
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
+import { extname } from 'node:path';
 import Anthropic from '@anthropic-ai/sdk';
 
 const PORT = 3000;
@@ -27,12 +28,18 @@ async function ask(prompt) {
   throw new Error('The search took too long. Please try again.');
 }
 
+// Only the front end is public. The pattern has no "." in folder names, so ../ can't escape to server.mjs or .env.
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8' };
+function publicFile(p) {
+  if (p === '/' || p === '/index.html') return 'index.html';
+  if (p === '/styles.css' || /^\/js\/[\w/-]+\.js$/.test(p)) return p.slice(1);
+}
+
 http.createServer(async (req, res) => {
   const send = (status, type, body) => { res.writeHead(status, { 'Content-Type': type }); res.end(body); };
   try {
-    if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html')) {
-      return send(200, 'text/html; charset=utf-8', await readFile(new URL('./index.html', import.meta.url)));
-    }
+    const file = req.method === 'GET' && publicFile(new URL(req.url, 'http://x').pathname);
+    if (file) return send(200, TYPES[extname(file)], await readFile(new URL('./' + file, import.meta.url)));
     if (req.method === 'POST' && req.url === '/api/ask') {
       // Other websites can't send a JSON content type here without a CORS preflight (which we never answer),
       // so this blocks them from spending your API credits via a hidden form in your browser.
@@ -46,6 +53,7 @@ http.createServer(async (req, res) => {
     }
     send(404, 'text/plain', 'Not found');
   } catch (e) {
+    if (e.code === 'ENOENT') return send(404, 'text/plain', 'Not found');
     console.error(e);
     const msg = e instanceof Anthropic.AuthenticationError ? 'API key missing or invalid. Check ANTHROPIC_API_KEY in .env.'
       : e instanceof Anthropic.RateLimitError ? 'Rate limited by the Claude API. Wait a minute and try again.'
