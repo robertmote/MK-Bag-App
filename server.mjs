@@ -35,8 +35,14 @@ function publicFile(p) {
   if (p === '/styles.css' || /^\/js\/[\w/-]+\.js$/.test(p)) return p.slice(1);
 }
 
+// DNS rebinding defence: a hostile page re-pointed at 127.0.0.1 still sends its own domain as Host/Origin.
+const ALLOWED_HOSTS = new Set([`localhost:${PORT}`, `127.0.0.1:${PORT}`]);
+const ALLOWED_ORIGINS = new Set([...ALLOWED_HOSTS].map(h => `http://${h}`));
+let inFlight = 0; // caps simultaneous Claude calls, so a runaway loop can't pile up cost
+
 http.createServer(async (req, res) => {
-  const send = (status, type, body) => { res.writeHead(status, { 'Content-Type': type }); res.end(body); };
+  const send = (status, type, body) => { res.writeHead(status, { 'Content-Type': type, 'X-Content-Type-Options': 'nosniff' }); res.end(body); };
+  if (!ALLOWED_HOSTS.has(req.headers.host)) return send(421, 'text/plain', 'Misdirected request');
   try {
     const file = req.method === 'GET' && publicFile(new URL(req.url, 'http://x').pathname);
     if (file) return send(200, TYPES[extname(file)], await readFile(new URL('./' + file, import.meta.url)));
@@ -44,12 +50,17 @@ http.createServer(async (req, res) => {
       // Other websites can't send a JSON content type here without a CORS preflight (which we never answer),
       // so this blocks them from spending your API credits via a hidden form in your browser.
       if (!req.headers['content-type']?.startsWith('application/json')) return send(415, 'application/json', '{"error":"Expected JSON"}');
+      if (req.headers.origin && !ALLOWED_ORIGINS.has(req.headers.origin)) return send(403, 'application/json', '{"error":"Forbidden origin"}');
       let body = '';
-      for await (const chunk of req) { body += chunk; if (body.length > 100_000) return send(413, 'application/json', '{"error":"Request too large"}'); }
+      // The app's real prompts are under 3 KB
+      for await (const chunk of req) { body += chunk; if (body.length > 20_000) return send(413, 'application/json', '{"error":"Request too large"}'); }
       let prompt;
       try { ({ prompt } = JSON.parse(body)); } catch { return send(400, 'application/json', '{"error":"Invalid JSON"}'); }
       if (typeof prompt !== 'string' || !prompt) return send(400, 'application/json', '{"error":"Missing prompt"}');
-      return send(200, 'application/json', JSON.stringify({ text: await ask(prompt) }));
+      if (inFlight >= 2) return send(429, 'application/json', '{"error":"Busy with another AI request. Try again shortly."}');
+      inFlight++;
+      try { return send(200, 'application/json', JSON.stringify({ text: await ask(prompt) })); }
+      finally { inFlight--; }
     }
     send(404, 'text/plain', 'Not found');
   } catch (e) {

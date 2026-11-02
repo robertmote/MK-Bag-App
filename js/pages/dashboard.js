@@ -131,9 +131,12 @@ Use realistic resale market prices (not retail). If you cannot find data for a b
     results.forEach(r=>{
       const bag=snapshot[r.index-1];
       if(!bag||!S.bags.some(b=>b.id===bag.id))return; // deleted while we waited
-      const est=Number(r.estimatedValue);
-      if(est>0){
-        const oldVal=S.bags.find(b=>b.id===bag.id).currentValue;
+      const est=Number(r.estimatedValue),oldVal=S.bags.find(b=>b.id===bag.id).currentValue;
+      // Web pages Claude reads can try to steer estimates; reject anything non-finite or more than 5x away from the current value
+      const plausible=Number.isFinite(est)&&est>0&&(!oldVal||(est<oldVal*5&&est>oldVal/5));
+      if(r.estimatedValue!=null&&!plausible){
+        log.push({name:bag.name,ok:false,error:'Estimate rejected as implausible ('+r.estimatedValue+'). Update it by hand if it is right.'});
+      } else if(plausible){
         const newVal=Math.round(est);
         S.bags=S.bags.map(b=>b.id===bag.id?{...b,currentValue:newVal,lastAiUpdate:todayStr()}:b);
         log.push({name:bag.name,ok:true,oldVal,newVal,source:[r.priceRange,r.source].filter(Boolean).join(' · ')});
