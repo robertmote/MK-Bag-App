@@ -29,10 +29,12 @@ async function ask(prompt) {
 }
 
 // Only the front end is public. The pattern has no "." in folder names, so ../ can't escape to server.mjs or .env.
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
+  '.svg': 'image/svg+xml', '.png': 'image/png' };
+const TOP_LEVEL = new Set(['/styles.css', '/icon.svg', '/apple-touch-icon.png']);
 function publicFile(p) {
   if (p === '/' || p === '/index.html') return 'index.html';
-  if (p === '/styles.css' || /^\/js\/[\w/-]+\.js$/.test(p)) return p.slice(1);
+  if (TOP_LEVEL.has(p) || /^\/js\/[\w/-]+\.js$/.test(p)) return p.slice(1);
 }
 
 // DNS rebinding defence: a hostile page re-pointed at 127.0.0.1 still sends its own domain as Host/Origin.

@@ -11,7 +11,8 @@ Vanilla HTML/CSS/JS front end using native ES modules (no build step), plus `ser
 - `js/store.js`: option lists, seed data, the state object `S`, localStorage load/save.
 - `js/helpers.js`: formatting, calculations, small UI pieces, `toast()`, `askClaude()`.
 - `js/pages/*.js`: one file per page; each exports its `renderX()` and its handlers.
-- `server.mjs` serves only `index.html`, `styles.css` and `js/**/*.js` (an allowlist), so `.env` and server code are never exposed.
+- `icon.svg`: app icon (browser tab). `apple-touch-icon.png`: 180px PNG of the same design with square corners (iOS rounds them; Android home screens use it too). If the SVG changes, regenerate the PNG to match.
+- `server.mjs` serves only an allowlist (`index.html`, `styles.css`, the two icons, `js/**/*.js`), so `.env` and server code are never exposed.
 
 ## How it works
 - State lives in `S`; every change calls `render()`, which rebuilds `#main` via `innerHTML`.
