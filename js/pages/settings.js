@@ -22,7 +22,7 @@ export function renderSettings(){
           <div class="field"><label>Email</label><input id="s-email" type="email" class="inp" value="${esc(s.email||'')}" placeholder="you@example.com"></div>
         </div>
         <div class="field" style="max-width:260px"><label>App name (shown in sidebar)</label>
-          <input id="s-appname" class="inp" value="${esc(s.appName||'')}" placeholder="Mary Katherine"></div>
+          <input id="s-appname" class="inp" value="${esc(s.appName||'')}" placeholder="Dustbag"></div>
       </div>
       <div class="card">
         <div class="section-lbl">Display preferences</div>

@@ -21,7 +21,7 @@ export const SEED_WISHLIST=[
   {id:'w1',brand:'Hermès',model:'Kelly 28',color:'Rouge Casaque',material:'Epsom leather',hardware:'Gold (GHW)',maxBudget:25000,notes:'Dream bag — any year.',addedAt:'2024-03-01'},
   {id:'w2',brand:'Chanel',model:'19 Bag Large',color:'Black',material:'Lambskin',hardware:'Mixed',maxBudget:9000,notes:'Prefer 2021 or newer.',addedAt:'2024-04-15'}
 ];
-export const DEF_SETTINGS={name:'Mary Katherine',email:'',appName:'Mary Katherine',currency:'USD',plan:'Pro plan',notifyAlerts:true,notifyMarket:false,notifyReports:true};
+export const DEF_SETTINGS={name:'Mary Katherine',email:'',appName:'Dustbag',currency:'USD',plan:'Pro plan',notifyAlerts:true,notifyMarket:false,notifyReports:true};
 
 export const S={
   page:'dashboard',
@@ -47,6 +47,8 @@ export function loadAll(){
   S.wishlist=lsGet('Mary Katherine_wishlist',SEED_WISHLIST);
   const sv=lsGet('Mary Katherine_settings',null);
   if(sv) S.settings={...DEF_SETTINGS,...sv};
+  if(S.settings.appName==='Mary Katherine') S.settings.appName='Dustbag'; // old default from before the rename; a custom name is kept
+  // Storage keys keep the old "Mary Katherine_" prefix on purpose: renaming them would orphan saved collections.
   if(S.bags.length) S.colSelected=S.bags[0].id;
 }
 export const saveBags=()=>lsSet('Mary Katherine_bags',S.bags);

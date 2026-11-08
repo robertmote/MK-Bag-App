@@ -73,4 +73,4 @@ http.createServer(async (req, res) => {
       : e.message;
     send(e.status || 500, 'application/json', JSON.stringify({ error: msg }));
   }
-}).listen(PORT, '127.0.0.1', () => console.log(`MK App running at http://localhost:${PORT}`));
+}).listen(PORT, '127.0.0.1', () => console.log(`Dustbag running at http://localhost:${PORT}`));

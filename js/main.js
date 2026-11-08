@@ -46,7 +46,7 @@ function syncSidebar(){
   $('sb-avatar').textContent=init;
   $('sb-name').textContent=S.settings.name||'Mary Katherine';
   $('sb-plan').textContent=S.settings.plan||'Pro plan';
-  $('sb-appname').textContent=S.settings.appName||'Mary Katherine';
+  $('sb-appname').textContent=S.settings.appName||'Dustbag';
 }
 
 const inputKey=el=>el?.dataset?.input?el.dataset.input+'|'+(el.dataset.arg??''):null;

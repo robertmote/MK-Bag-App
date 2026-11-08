@@ -1,4 +1,4 @@
-# Mary Katherine — Luxury Bag Value Tracker
+# Dustbag — Luxury Bag Value Tracker (made for Mary Katherine)
 
 Vanilla HTML/CSS/JS front end using native ES modules (no build step), plus `server.mjs`, a small Node server that serves the front end and proxies AI calls. Started as a claude.ai chat artifact, moved here. Hosted on GitHub Pages from the repo root, which is why the front-end files sit at the top level instead of in a subfolder.
 
